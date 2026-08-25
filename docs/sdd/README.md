@@ -1,104 +1,51 @@
-# SDD Harness Index
+# SDD Harness — Routing Index
 
-Use this index to load only the context needed for a task. Do not read every harness document by default.
+Load only what the task needs. Do not read every harness document by default.
 
-## Always Read First
+## Start Here, Always
 
-- `docs/sdd/README.md`: this routing index.
-- `docs/sdd/HARNESS_VERSION.md`: active harness version.
-- The assigned task plan in `docs/plans/`.
+1. `STATUS.md` (repo root) — current state of every task, decision, and journal entry.
+2. `harness.json` (repo root) — active harness version and profile.
+3. The assigned task file in `docs/tasks/`.
 
-If no task plan exists yet, read only the documents needed to create one.
+If those three answer the question, stop reading.
 
-## Universal Rules
+## Profiles
 
-Read these when executing any planned task:
+`harness.json` declares the active profile. The profile decides roles, required records, and gates.
 
-- `docs/sdd/SDD_HARNESS.md`: core principles, flow, Definition of Ready, Definition of Done.
-- `docs/sdd/WORKFLOW_PROTOCOL.md`: task states, baseline gate, final acceptance gate, human validation.
-- `docs/sdd/CONTEXT_PROTOCOL.md`: context packet, source selection, token budget, anti-hallucination rules.
+| | `solo` | `team` |
+|---|---|---|
+| Roles | Planner · Implementer · Reviewer | all seven in `AGENTS.md` |
+| Trace | bounded block inside the task file | separate file in `docs/traces/` |
+| Human validation | implicit on accepting the change | explicit gate |
+| Required records | task file + journal line | task + trace + journal + validation record |
+| Baseline & final check gates | required | required |
 
-## Read by Role
+Normative definitions are in `HARNESS.md`.
 
-### Planner
+## The Five Documents
 
-- `docs/sdd/TASK_TEMPLATE.md`
-- `docs/sdd/WORKFLOW_PROTOCOL.md`
-- `docs/sdd/CONTEXT_PROTOCOL.md`
-- Relevant files in `docs/project/`
-- Recent related traces in `docs/traces/` only when needed
-
-### Frontend Implementer
-
-- `docs/sdd/AGENT_PROTOCOL.md`
-- `docs/sdd/WORKFLOW_PROTOCOL.md`
-- `docs/sdd/TRACE_PROTOCOL.md`
-- Assigned task plan
-- Relevant project specs, design handoff, quality gates, and affected source files
-
-### Backend Implementer
-
-- `docs/sdd/AGENT_PROTOCOL.md`
-- `docs/sdd/WORKFLOW_PROTOCOL.md`
-- `docs/sdd/TRACE_PROTOCOL.md`
-- Assigned task plan
-- Relevant architecture, data model, quality gates, and affected source files
-
-### Tester
-
-- `docs/sdd/AGENT_PROTOCOL.md`
-- `docs/sdd/WORKFLOW_PROTOCOL.md`
-- `docs/sdd/TRACE_PROTOCOL.md`
-- Assigned task plan
-- Relevant acceptance criteria, quality gates, and affected test files
-
-### Reviewer
-
-- `docs/sdd/REVIEW_PROTOCOL.md`
-- `docs/sdd/WORKFLOW_PROTOCOL.md`
-- Assigned task plan
-- Implementer trace
-- Changed files and verification results
-
-### Release Engineer
-
-- `docs/sdd/AGENT_PROTOCOL.md`
-- `docs/sdd/WORKFLOW_PROTOCOL.md`
-- `docs/sdd/TRACE_PROTOCOL.md`
-- Assigned release task
-- Quality gates, deployment notes, and release-relevant decisions
-
-### UX/Motion Designer
-
-- `docs/sdd/AGENT_PROTOCOL.md`
-- `docs/sdd/CONTEXT_PROTOCOL.md`
-- Assigned task plan
-- Design handoff and relevant project specs
-
-## Governance Changes
-
-For proposed changes to the harness, roles, templates, protocols, gates, or versioning, read:
-
-- `docs/sdd/AGENT_PROTOCOL.md`
-- `docs/sdd/DECISION_LOG.md`
-- `docs/sdd/HARNESS_VERSION.md`
-- The specific document being changed
-
-Governance changes require explicit human validation before they are applied.
+| Document | Read it when |
+|---|---|
+| `HARNESS.md` | Executing any task: principles, flow, profiles, DoR, DoD, gates |
+| `AGENTS.md` | You need role boundaries, universal agent rules, or escalation |
+| `PROTOCOLS.md` | Selecting context, writing a trace, or reviewing a change |
+| `TEMPLATES.md` | Creating a task, a decision, a journal line, or a trace block |
+| `VERSION.md` | Recording or changing the harness version |
 
 ## Project Sources
 
-Read only the project files relevant to the task:
+Read only what the task touches, from `docs/project/`: `brief.md`, `requirements.json`,
+`user-stories.json`, `acceptance-criteria.json`, `architecture.md`, `design-handoff.md`,
+`data-model.md`, `quality-gates.md`.
 
-- `docs/project/brief.md`
-- `docs/project/requirements.json`
-- `docs/project/user-stories.json`
-- `docs/project/acceptance-criteria.json`
-- `docs/project/architecture.md`
-- `docs/project/design-handoff.md`
-- `docs/project/data-model.md`
-- `docs/project/quality-gates.md`
+## Decisions
 
-## Context Budget Rule
+`docs/decisions/README.md` is the index. Open individual `D-###-*.md` files only when a task
+references them.
 
-Start with the index, the task plan, and the smallest applicable protocol set. Add more sources only when the task requires them or when verification exposes a gap.
+## Governance Changes
+
+Changes to `docs/sdd/`, `harness.json`, or the scripts require explicit human approval in both
+profiles, a decision file, and a `VERSION.md` entry. See `AGENTS.md` § Controlled Self-Improvement.
