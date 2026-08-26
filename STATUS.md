@@ -6,7 +6,9 @@ Harness `0.2.0` · profile `solo`
 
 ## Tasks
 
-No tasks yet. Create one from `docs/sdd/TEMPLATES.md` in `docs/tasks/`.
+| Task | State | Goal |
+|---|---|---|
+| [T-001](docs/tasks/T-001-harness-self-baseline.md) | `done` | Give this repo the green baseline it demands of every project it is copied into — real quality gates and an automated test suite for the two scripts that enforce the harness. |
 
 ## Next
 
@@ -18,6 +20,6 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
-Empty.
+- 2026-08-26 | T-001 | done | harness baseline: 32 tests over scripts, real quality gates | 7 files | tests 32/32, check clean | -
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)
