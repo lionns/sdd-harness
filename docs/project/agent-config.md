@@ -2,7 +2,7 @@
 
 This file defines which AI model fills each SDD role. Copy this template into your project and fill in the model assignments.
 
-Model assignment is project-specific configuration. Role definitions live in `docs/sdd/ROLES.md`.
+Model assignment is project-specific configuration. Role definitions live in `docs/sdd/AGENTS.md`.
 
 ---
 
@@ -48,7 +48,7 @@ Model assignment is project-specific configuration. Role definitions live in `do
 
 ## References
 
-- `docs/sdd/ROLES.md` — role definitions
+- `docs/sdd/AGENTS.md` — role definitions
 - `docs/project/quality-gates.md` — commands used by Tester and Release Engineer
 - `docs/project/design-handoff.md` — primary source for UX/Motion Designer
-- `docs/sdd/DECISION_LOG.md` — record model assignment decisions here
+- `docs/decisions/` — record model assignment decisions as their own file
