@@ -59,5 +59,7 @@ test("journal skips the heading, the blockquote, and blank lines", () => {
 
 test("sddDocLines totals only markdown in docs/sdd, and is zero when empty", () => {
   assert.equal(sddDocLines(makeRepo()), 0);
-  assert.equal(sddDocLines(makeRepo({ sdd: { "A.md": "one\ntwo\n", "B.txt": "ignored\n" } })), 3);
+  // 2, not 3: the trailing newline is not a line. Counted the same way the linter counts a task
+  // file, via the shared `lineCount` (T-002).
+  assert.equal(sddDocLines(makeRepo({ sdd: { "A.md": "one\ntwo\n", "B.txt": "ignored\n" } })), 2);
 });

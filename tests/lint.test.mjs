@@ -22,7 +22,7 @@ test("a well-formed repo lints clean and reports its counts", () => {
   });
   const { code, stdout } = lint(root);
   assert.equal(code, 0, "clean repo must exit 0");
-  assert.match(stdout, /harness-lint: clean \(1 tasks, 1 decisions, docs\/sdd 3\/600 lines\)/);
+  assert.match(stdout, /harness-lint: clean \(1 tasks, 1 decisions, docs\/sdd 2\/600 lines\)/);
 });
 
 test("an unknown profile in harness.json is rejected", () => {

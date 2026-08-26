@@ -17,3 +17,4 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-008](D-008-decisions-as-files.md) | 2026-08-25 | One file per decision, not one log | `accepted` | none |
 | [D-009](D-009-enforced-record-budgets.md) | 2026-08-25 | Record budgets are enforced, not advised | `accepted` | partially D-002 |
 | [D-010](D-010-generated-status-and-journal.md) | 2026-08-25 | `STATUS.md` generated, `JOURNAL.md` append-only | `accepted` | partially D-005 |
+| [D-011](D-011-canonical-path-resolution.md) | 2026-08-26 | Scripts resolve paths canonically | `accepted` | none |

@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.2.0` · Status: `Operational` · Date: 2026-08-25
+Version: `0.2.1` · Status: `Operational` · Date: 2026-08-26
 
 The active version and profile for a project live in its `harness.json`. This file is the changelog
 and the versioning rules.
@@ -20,6 +20,16 @@ and the versioning rules.
 - A project may stay on an older version. `0.1.0` remains valid for projects that have not migrated.
 
 ## Changelog
+
+### 0.2.1 — 2026-08-26
+
+Fixes path resolution in the enforcement scripts. No rule, budget, or record shape changes. D-011.
+
+- **Canonical paths.** `harness-status` no longer exits 0 without generating when the repo path
+  contains a symlink, and neither script fails on a path containing a space.
+- **One line count.** `sddDocLines` uses the same `lineCount` as the budget checks; a trailing
+  newline is no longer a line. Reported `docs/sdd/` totals drop by one per file.
+- **Tests.** `npm test` covers the library, both renderers, and the `harness-lint` CLI contract.
 
 ### 0.2.0 — 2026-08-25
 

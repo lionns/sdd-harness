@@ -3,7 +3,7 @@
 A reusable Specification-Driven Development workflow for agent-assisted delivery. Project-agnostic:
 product and architecture details live in each project's `docs/project/`.
 
-Current version: **0.2.0** — see [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
+Current version: **0.2.1** — see [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
 ## What it is
 
@@ -42,8 +42,10 @@ Point the project's `CLAUDE.md` at `STATUS.md` as the first file to read each se
 ## Commands
 
 ```sh
+npm test                          # the harness's own suite; no dependencies, Node >= 24
 node scripts/harness-status.mjs   # regenerate STATUS.md and the decision index
 node scripts/harness-lint.mjs     # enforce budgets and record shape; exit 1 on violation
+npm run check                     # all three, in order
 ```
 
 `harness-status` is deterministic — running it twice produces no diff. Never hand-edit what it writes.

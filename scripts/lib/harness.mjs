@@ -1,10 +1,34 @@
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, realpathSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-export const ROOT = new URL("../../", import.meta.url).pathname;
+// fileURLToPath, not URL.pathname: the latter leaves percent-encoding in place, so a repo under a
+// path containing a space resolves to `.../has%20space/harness.json` and every read fails (T-002).
+export const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 export const TASK_STATES = ["ready", "doing", "review", "blocked", "done", "superseded"];
 export const DECISION_STATES = ["proposed", "accepted", "superseded"];
 export const OPEN_STATES = ["ready", "doing", "review", "blocked"];
+
+/**
+ * True when `moduleUrl` is the script Node was asked to run.
+ *
+ * Compares canonical paths. Node resolves symlinks when it loads a module, while `process.argv[1]`
+ * keeps whatever spelling the caller used, so the two disagree through a symlinked path and a naive
+ * equality check makes the script exit 0 having done nothing (T-002).
+ */
+export function isEntrypoint(moduleUrl) {
+  if (!process.argv[1]) return false;
+  try {
+    return fileURLToPath(moduleUrl) === realpathSync(process.argv[1]);
+  } catch {
+    return false;
+  }
+}
+
+/** Lines in a record, ignoring a trailing newline. The one definition every budget check uses. */
+export function lineCount(text) {
+  return text === "" ? 0 : text.replace(/\n$/, "").split(/\r?\n/).length;
+}
 
 export function config(root = ROOT) {
   return JSON.parse(readFileSync(join(root, "harness.json"), "utf8"));
@@ -70,8 +94,5 @@ export function journal(root = ROOT) {
 }
 
 export function sddDocLines(root = ROOT) {
-  return listMarkdown(join(root, "docs/sdd")).reduce(
-    (total, f) => total + f.text.split(/\r?\n/).length,
-    0,
-  );
+  return listMarkdown(join(root, "docs/sdd")).reduce((total, f) => total + lineCount(f.text), 0);
 }

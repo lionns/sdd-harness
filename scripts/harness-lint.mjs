@@ -6,7 +6,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import {
-  ROOT, config, tasks, decisions, journal, section, sddDocLines,
+  ROOT, config, tasks, decisions, journal, section, sddDocLines, lineCount,
   TASK_STATES, DECISION_STATES,
 } from "./lib/harness.mjs";
 import { renderStatus, renderDecisionIndex } from "./harness-status.mjs";
@@ -18,7 +18,6 @@ const cfg = config();
 const budgets = cfg.budgets ?? {};
 const PROFILES = ["solo", "team"];
 const REQUIRED_META = ["id", "title", "status", "profile", "harness", "goal"];
-const lineCount = (text) => text.replace(/\n$/, "").split(/\r?\n/).length;
 
 if (!PROFILES.includes(cfg.profile)) {
   fail("harness.json", `profile must be one of ${PROFILES.join(" | ")}, got "${cfg.profile}"`);
