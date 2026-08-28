@@ -21,4 +21,9 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-012](D-012-adoption-templates.md) | 2026-08-27 | Adoption templates live in `templates/`, not `docs/project/` | `accepted` | none |
 | [D-013](D-013-closure-integrity.md) | 2026-08-27 | Closure integrity is linted, and `team` is enforced | `accepted` | none |
 | [D-014](D-014-bootstrap-script.md) | 2026-08-27 | Adoption is one command, not five manual steps | `accepted` | none |
+| [D-015](D-015-verification-that-survives.md) | 2026-08-27 | The checks are part of the contract, not a dial | `proposed` | none |
+| [D-016](D-016-agents-md-entry-point.md) | 2026-08-27 | `AGENTS.md` is the entry point; `CLAUDE.md` is a pointer | `proposed` | none |
+| [D-017](D-017-enforcement-off-the-agent.md) | 2026-08-27 | Enforcement belongs in hooks, not in the agent's memory | `proposed` | none |
+| [D-018](D-018-testable-criteria-grammar.md) | 2026-08-27 | A grammar for behavioral criteria, and no linter for it | `proposed` | none |
+| [D-019](D-019-forward-traceability-only.md) | 2026-08-27 | Forward traceability is linted; reverse traceability is not | `proposed` | none |
 | [D-020](D-020-foundation-before-task-one.md) | 2026-08-27 | The foundation is settled before task one, as decisions | `accepted` | none |

@@ -8,6 +8,11 @@ Harness `0.4.0` · profile `solo`
 
 | Task | State | Goal |
 |---|---|---|
+| [T-006](docs/tasks/T-006-verification-that-survives.md) | `ready` | Close the gap between "the configured checks pass" and "the change works", by forbidding the cheap ways to make a gate green and by requiring one criterion about composition rather than isolation. |
+| [T-007](docs/tasks/T-007-agents-md-entry-point.md) | `ready` | Ship `AGENTS.md` as the single agent entry point, with `CLAUDE.md` reduced to a one-line pointer, so the harness works with any agent family at no extra context cost. |
+| [T-008](docs/tasks/T-008-enforcement-without-the-agent.md) | `ready` | Package the harness as an optional Claude Code plugin whose hooks run the enforcement scripts automatically, so compliance stops costing context on every session and stops depending on the agent remembering. |
+| [T-009](docs/tasks/T-009-testable-criteria.md) | `ready` | Adopt a constrained grammar for behavioral acceptance criteria so a criterion states a trigger and an observable result, removing the ambiguity an agent would otherwise resolve by guessing. |
+| [T-010](docs/tasks/T-010-orphan-and-drift-check.md) | `ready` | Make the linter report requirements that no task implements and tasks that cite no source, so the gap between the specification and the work is visible at zero cost per session. |
 | [T-001](docs/tasks/T-001-harness-self-baseline.md) | `done` | Give this repo the green baseline it demands of every project it is copied into — real quality gates and an automated test suite for the two scripts that enforce the harness. |
 | [T-002](docs/tasks/T-002-script-path-resolution.md) | `done` | Make the two scripts work when the repo path contains a symlink or a space, and stop the docs/sdd line count from disagreeing with the linter's own. |
 | [T-003](docs/tasks/T-003-adoption-templates.md) | `done` | Give adopters a pristine `templates/` tree to copy — including the `CLAUDE.md` entry point the harness needs to take effect — and let `docs/project/` hold this repo's real specifications instead of a mix of both. |
@@ -17,11 +22,15 @@ Harness `0.4.0` · profile `solo`
 
 ## Next
 
-Nothing open. Plan the next task before implementing anything.
+**T-006** (`ready`) — Close the gap between "the configured checks pass" and "the change works", by forbidding the cheap ways to make a gate green and by requiring one criterion about composition rather than isolation.
 
 ## Open decisions
 
-None. All decisions are accepted or superseded.
+- D-015 — The checks are part of the contract, not a dial — `proposed`, needs human approval
+- D-016 — `AGENTS.md` is the entry point; `CLAUDE.md` is a pointer — `proposed`, needs human approval
+- D-017 — Enforcement belongs in hooks, not in the agent's memory — `proposed`, needs human approval
+- D-018 — A grammar for behavioral criteria, and no linter for it — `proposed`, needs human approval
+- D-019 — Forward traceability is linted; reverse traceability is not — `proposed`, needs human approval
 
 ## Journal — last 5
 
