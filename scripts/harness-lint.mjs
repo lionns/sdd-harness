@@ -6,7 +6,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import {
-  ROOT, config, tasks, decisions, journal, traces, knownVersions, section, sddDocLines, lineCount,
+  ROOT, config, tasks, decisions, journal, traces, knownVersions, specIds, section, sddDocLines, lineCount,
   TASK_STATES, DECISION_STATES,
 } from "./lib/harness.mjs";
 import { renderStatus, renderDecisionIndex } from "./harness-status.mjs";
@@ -28,6 +28,7 @@ const journalIds = new Set(journal().map((e) => e.line.split("|")[1]?.trim()));
 const versions = knownVersions();
 const traceFiles = traces();
 const TRACE_NAME = /^\d{4}-\d{2}-\d{2}_([A-Z]+-\d+)_[a-z-]+\.md$/;
+const declaredIds = specIds();
 
 for (const task of tasks()) {
   const where = `docs/tasks/${task.name}`;
@@ -49,6 +50,12 @@ for (const task of tasks()) {
   }
   for (const id of task.meta.decisions ?? []) {
     if (!decisionIds.has(id)) fail(where, `references decision ${id}, which has no file`);
+  }
+  // Forward traceability (D-019): a link to a requirement that does not exist is worse than none.
+  for (const id of task.meta.implements ?? []) {
+    if (declaredIds.size && !declaredIds.has(id)) {
+      fail(where, `implements ${id}, which no file in docs/project/ declares`);
+    }
   }
 
   const lines = lineCount(task.text);
@@ -77,6 +84,15 @@ for (const task of tasks()) {
     const unchecked = (section(task.text, "Acceptance Criteria") ?? []).filter((l) => /^\s*-\s*\[ \]/.test(l));
     if (unchecked.length) {
       fail(where, `status is done but ${unchecked.length} acceptance criteria are still unchecked`);
+    }
+    if (!(section(task.text, "Sources") ?? []).some((l) => l.trim())) {
+      fail(where, "status is done but `## Sources` is empty — a closed task must record what defined it");
+    }
+    // The configured gate is the same for every task, so on its own it verifies nothing specific to
+    // this change. Something had to be checked that only this task could break (D-015).
+    const verification = (section(task.text, "Verification") ?? []).join("\n");
+    if (!/^-\s*Task-specific:\s*\S/im.test(verification)) {
+      fail(where, "status is done but `## Verification` names no task-specific check");
     }
   }
 
@@ -170,8 +186,18 @@ for (const [path, render] of [["STATUS.md", renderStatus], ["docs/decisions/READ
   if (current !== render()) fail(path, "stale — run `node scripts/harness-status.mjs`");
 }
 
+// A backlog is not a defect, so this never changes the exit code — it only makes the gap between
+// what was specified and what was built visible at zero cost per session (D-019).
+const implemented = new Set(tasks().flatMap((t) => t.meta?.implements ?? []));
+const unimplemented = [...declaredIds].filter((id) => !implemented.has(id));
+
 if (problems.length === 0) {
   console.log(`harness-lint: clean (${tasks().length} tasks, ${decisionIds.size} decisions, docs/sdd ${sdd}/${budgets.sddDocsTotalLines} lines)`);
+  if (unimplemented.length) {
+    const shown = unimplemented.slice(0, 5).join(", ");
+    const rest = unimplemented.length > 5 ? `, +${unimplemented.length - 5} more` : "";
+    console.log(`harness-lint: ${unimplemented.length} spec id(s) no task implements — ${shown}${rest}`);
+  }
   process.exit(0);
 }
 console.error(`harness-lint: ${problems.length} problem(s)\n`);

@@ -1,4 +1,4 @@
-# Agents — Roles, Rules, Escalation
+# Roles — Responsibilities, Rules, Escalation
 
 ## Universal Rules
 
@@ -11,6 +11,8 @@
 - Verify with the strongest practical check available.
 - Do not start implementation on a red baseline unless the task is to fix it.
 - Do not present a change as done while final checks fail.
+- Deleting, skipping, relaxing, or narrowing a check to reach green is a defect, not a fix. A check
+  that is genuinely wrong is changed by a decision, never by an edit made to get past it.
 - Report blockers early, with evidence.
 - Record the trace required by the active profile.
 
@@ -29,17 +31,6 @@ In `solo`, only the first three exist; the others are hats the same agent wears,
 
 In `team`, the Implementer role splits into **Frontend Implementer** and **Backend Implementer**
 with the same responsibilities scoped to their side of the contract.
-
-## Standard Task Input
-
-`id`, `role`, `goal`, `sources`, `scope`, `outOfScope`, `acceptanceCriteria`, `baselineChecks`,
-`finalChecks`, `constraints`, `deliverables`. In `team`, also `humanValidation`.
-
-## Standard Agent Output
-
-Completed changes · files modified · verification performed and results · baseline and final check
-results · decisions made or still needed · risks and follow-up · any deviation from the task and
-why. Plus the trace required by the profile.
 
 ## Escalation
 

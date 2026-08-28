@@ -247,3 +247,74 @@ test("a superseded decision stops settling its topic", () => {
     decisions: { "D-001-a.md": decision({ state: "superseded", foundation: "runtime" }) },
   }), "harness.json", /unsettled: runtime/);
 });
+
+// --- Forward traceability (D-019) ---
+
+const specs = { "requirements.json": JSON.stringify({ functional: [{ id: "FR-1" }], nonFunctional: [{ id: "NFR-1" }] }) };
+
+test("a task may only claim a requirement the project actually declares", () => {
+  rejects(makeRepo({ project: specs, tasks: { "T-001-a.md": task({ implements: ["FR-99"] }) } }),
+    "docs/tasks/T-001-a.md", /implements FR-99, which no file in docs\/project\/ declares/);
+
+  assert.equal(lint(makeRepo({ project: specs, tasks: { "T-001-a.md": task({ implements: ["FR-1", "NFR-1"] }) } })).code,
+    0, "ids nested under different keys must both resolve");
+});
+
+test("omitting implements is valid, and a project with no specs disables the check", () => {
+  assert.equal(lint(makeRepo({ project: specs, tasks: { "T-001-a.md": task() } })).code, 0);
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": task({ implements: ["FR-99"] }) } })).code,
+    0, "a project that declares nothing cannot be held to it");
+});
+
+test("a malformed spec file does not crash the linter", () => {
+  assert.equal(lint(makeRepo({ project: { "requirements.json": "{ not json" }, tasks: { "T-001-a.md": task() } })).code, 0);
+});
+
+test("a closed task must record what defined it", () => {
+  const empty = task().replace("## Sources\n\n- `docs/project/brief.md`\n", "## Sources\n\n");
+  rejects(makeRepo({ tasks: { "T-001-a.md": empty } }), "docs/tasks/T-001-a.md",
+    /status is done but `## Sources` is empty/);
+
+  const open = task({ status: "ready" }).replace("## Sources\n\n- `docs/project/brief.md`\n", "## Sources\n\n");
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": open } })).code, 0, "an open task may still be filling in");
+});
+
+test("unimplemented requirements are reported, never failed", () => {
+  const root = makeRepo({ project: specs, tasks: { "T-001-a.md": task({ implements: ["FR-1"] }) } });
+  const { code, stdout } = lint(root);
+  assert.equal(code, 0, "a backlog is not a defect");
+  assert.match(stdout, /1 spec id\(s\) no task implements — NFR-1/);
+  assert.doesNotMatch(stdout, /FR-1,/, "an implemented requirement must not be reported");
+});
+
+// --- Verification that survives (D-015) ---
+
+test("a closed task must name a check that only this change could break", () => {
+  const none = task().replace("## Verification\n\n- Task-specific: nothing to check.\n\n", "");
+  rejects(makeRepo({ tasks: { "T-001-a.md": none } }), "docs/tasks/T-001-a.md",
+    /status is done but `## Verification` names no task-specific check/);
+
+  const gateOnly = task().replace("- Task-specific: nothing to check.", "- Final: `npm run check`");
+  rejects(makeRepo({ tasks: { "T-001-a.md": gateOnly } }), "docs/tasks/T-001-a.md",
+    /names no task-specific check/);
+
+  const empty = task().replace("- Task-specific: nothing to check.", "- Task-specific:");
+  rejects(makeRepo({ tasks: { "T-001-a.md": empty } }), "docs/tasks/T-001-a.md",
+    /names no task-specific check/);
+
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": task({ status: "doing" }) } })).code,
+    0, "an open task has not made the claim yet");
+});
+
+test("WHEN one task breaks the closure rule and the verification rule THE SYSTEM SHALL report both in one run", () => {
+  const broken = task()
+    .replace("- Task-specific: nothing to check.", "- Final: `npm run check`")
+    .replace("- [x] Done.", "- [ ] Not done.");
+
+  const { code, stderr } = lint(makeRepo({ tasks: { "T-001-a.md": broken }, journal: "" }));
+  assert.equal(code, 1);
+  assert.match(stderr, /JOURNAL\.md has no line for T-001/, "T-004's closure rule");
+  assert.match(stderr, /1 acceptance criteria are still unchecked/, "T-004's criteria rule");
+  assert.match(stderr, /names no task-specific check/, "T-006's verification rule");
+  assert.match(stderr, /3 problem\(s\)/, "one run must report every violation, not the first");
+});

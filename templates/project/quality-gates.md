@@ -16,7 +16,10 @@ Run these before starting new implementation. Any required failure blocks the ta
 
 ## Final Acceptance Checks
 
-Run these before requesting review or human validation.
+Run these before requesting review or human validation. Both tables must be green. Weakening,
+skipping, or narrowing any of them to reach green is a defect, not a fix (`ROLES.md`).
+
+### Checks the agent iterates against
 
 | Check | Command or Procedure | Required | Notes |
 | --- | --- | --- | --- |
@@ -25,6 +28,16 @@ Run these before requesting review or human validation.
 | Type check | <!-- or `—` --> | | |
 | Lint | <!-- or `—` --> | | |
 | Build | <!-- or `—` --> | | |
+
+### Checks that exercise the change in composition
+
+At least one. A change can be made to pass the table above by narrowing it; it cannot be made to
+pass a check that runs it together with what already exists.
+
+| Check | Command or Procedure | Required | Notes |
+| --- | --- | --- | --- |
+| Integration | <!-- e.g. `npm run test:integration` --> | yes | Exercises this change against existing features, not in isolation |
+| End-to-end | <!-- or `—` --> | | |
 
 ## Manual Validation
 

@@ -15,6 +15,7 @@ harness: 0.3.0
 role: Implementer
 goal: One or two concrete sentences describing the desired outcome.
 decisions: []
+implements: [FR-1, US-2]   # optional; ids from docs/project/*.json, linted for existence
 ---
 
 ## Sources
@@ -73,6 +74,14 @@ Filled in as the task progresses; overwritten, not appended.
 
 - YYYY-MM-DD — read: … · did: … · checks: … · result: …
 ````
+
+### Acceptance Criteria
+
+Behavioral criteria state a trigger and an observable result:
+`WHEN a task is set to done with no journal line THE SYSTEM SHALL exit non-zero naming the id.`
+Non-behavioral ones stay plain: `the budget holds.` "Works correctly" is neither. At least one
+criterion must exercise the change together with existing behavior rather than in isolation. The
+grammar is not linted: a rule satisfiable by shape alone would be worse than none.
 
 ## Decision File
 

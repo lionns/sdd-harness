@@ -11,7 +11,7 @@ The harness has four record types. All are files; the filesystem is the whole st
 | `status` | enum | yes | `ready` `doing` `review` `blocked` `done` `superseded`. The only place state lives. |
 | `profile` | enum | yes | `solo` or `team`. |
 | `harness` | string | yes | Must appear as a `### x.y.z` heading in `docs/sdd/VERSION.md`. |
-| `role` | string | no | From `docs/sdd/AGENTS.md`. |
+| `role` | string | no | From `docs/sdd/ROLES.md`. |
 | `goal` | string | yes | One or two sentences. Rendered into `STATUS.md`. |
 | `decisions` | list | no | `D-###` ids; each must have a file. |
 

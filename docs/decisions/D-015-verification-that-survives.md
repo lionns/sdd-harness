@@ -1,6 +1,6 @@
 # D-015 — The checks are part of the contract, not a dial
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-08-27
 - Supersedes: none
 - Tasks: T-006

@@ -1,6 +1,6 @@
 # D-016 — `AGENTS.md` is the entry point; `CLAUDE.md` is a pointer
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-08-27
 - Supersedes: none
 - Tasks: T-007
@@ -25,6 +25,8 @@ by whichever agent is in the room.
 - Depends on Claude following a pointer. If it does not, the fallback is generating `CLAUDE.md` from
   `AGENTS.md` — still one source.
 - A length test is required, or the pointer will grow rules of its own.
+- The name was already taken: the roles document was `docs/sdd/AGENTS.md` and is now `ROLES.md`.
+  Closed task records still cite the old path; they are point-in-time and were not rewritten.
 
 ## References
 

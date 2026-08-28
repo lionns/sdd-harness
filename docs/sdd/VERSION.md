@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.5.0` · Status: `Operational` · Date: 2026-08-27
+Version: `0.6.0` · Status: `Operational` · Date: 2026-08-27
 
 The active version and profile for a project live in its `harness.json`. This file is the changelog
 and the versioning rules.
@@ -20,6 +20,22 @@ and the versioning rules.
 - A project may stay on an older version. `0.1.0` remains valid for projects that have not migrated.
 
 ## Changelog
+
+### 0.6.0 — 2026-08-27
+
+`AGENTS.md` becomes the entry point, and the checks — plus the criteria that drive them — get rules
+of their own. D-015, D-016, D-018, D-019, D-026.
+
+- **`AGENTS.md`** (D-016). Holds the rules; `CLAUDE.md` is a three-line pointer, tested so it cannot
+  grow a second rule set. The roles document is now `ROLES.md`, which frees the name.
+- **Checks are protected** (D-015). Weakening, skipping, or narrowing one to reach green is a
+  defect; a `done` task must name a task-specific check; the gate requires a check that exercises
+  the change in composition, not only in isolation.
+- **Forward traceability** (D-019). Tasks may declare `implements: [FR-1]`, linted for existence. A
+  `done` task needs a non-empty `## Sources`. Unimplemented ids are reported, never failed.
+- **Criteria grammar** (D-018). `WHEN <trigger> THE SYSTEM SHALL <observable result>`, documented
+  and deliberately not linted.
+- **Budget 600 → 650** (D-026), after deleting 26 lines of duplication to pay for it first.
 
 ### 0.5.0 — 2026-08-27
 

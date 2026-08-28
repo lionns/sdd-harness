@@ -115,6 +115,35 @@ export function knownVersions(root = ROOT) {
   return [...readFileSync(path, "utf8").matchAll(/^###\s+(\d+\.\d+\.\d+)/gm)].map((m) => m[1]);
 }
 
+/**
+ * Every `id` declared by the project's JSON specifications, so a task's `implements:` list can be
+ * checked against something real (T-010). Walks arbitrary shapes because `requirements.json` nests
+ * its ids under `functional`/`nonFunctional` while `user-stories.json` is a flat array. Empty when
+ * a project has no JSON specs, which disables the check rather than failing every task.
+ */
+export function specIds(root = ROOT) {
+  const ids = new Set();
+  const dir = join(root, "docs/project");
+  if (!existsSync(dir)) return ids;
+  for (const name of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
+    let parsed;
+    try {
+      parsed = JSON.parse(readFileSync(join(dir, name), "utf8"));
+    } catch {
+      continue; // A malformed spec is the project's problem to report, not this reader's to crash on.
+    }
+    const walk = (node) => {
+      if (Array.isArray(node)) return node.forEach(walk);
+      if (node && typeof node === "object") {
+        if (typeof node.id === "string") ids.add(node.id);
+        Object.values(node).forEach(walk);
+      }
+    };
+    walk(parsed);
+  }
+  return ids;
+}
+
 export function sddDocLines(root = ROOT) {
   return listMarkdown(join(root, "docs/sdd")).reduce((total, f) => total + lineCount(f.text), 0);
 }

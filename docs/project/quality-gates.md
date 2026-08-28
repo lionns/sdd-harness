@@ -15,7 +15,10 @@ Run these before starting new implementation.
 
 ## Final Acceptance Checks
 
-Run these before requesting review or human validation.
+Run these before requesting review or human validation. Both tables must be green. Weakening,
+skipping, or narrowing any of them to reach green is a defect (`docs/sdd/ROLES.md`).
+
+### Checks the agent iterates against
 
 | Check | Command or Procedure | Required | Notes |
 | --- | --- | --- | --- |
@@ -23,6 +26,13 @@ Run these before requesting review or human validation.
 | Harness records | `npm run check` | yes | Regenerates `STATUS.md`, then lints. Not optional. |
 | Type check | — | no | — |
 | Build | — | no | — |
+
+### Checks that exercise the change in composition
+
+| Check | Command or Procedure | Required | Notes |
+| --- | --- | --- | --- |
+| Integration | `npm test` — `tests/init.test.mjs`, `tests/hooks.test.mjs` | yes | Installs the harness into a temp repo and runs the real CLIs and the `Stop` hook against it, rather than importing them |
+| Rule composition | `npm test` — the multi-violation case in `tests/lint.test.mjs` | yes | Asserts every rule still reports in one run, not just the first |
 
 `npm run check` regenerates `STATUS.md` before linting, because `harness-lint` fails if it is stale.
 Run `npm test` first: it exercises the scripts that `check` then relies on.

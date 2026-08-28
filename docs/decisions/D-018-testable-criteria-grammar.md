@@ -1,6 +1,6 @@
 # D-018 — A grammar for behavioral criteria, and no linter for it
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-08-27
 - Supersedes: none
 - Tasks: T-009

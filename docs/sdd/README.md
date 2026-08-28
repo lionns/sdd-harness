@@ -20,7 +20,7 @@ and gates. The comparison and the normative definitions are in `HARNESS.md` § P
 | Document | Read it when |
 |---|---|
 | `HARNESS.md` | Executing any task: principles, inception, flow, profiles, DoR, DoD, gates |
-| `AGENTS.md` | You need role boundaries, universal agent rules, or escalation |
+| `ROLES.md` | You need role boundaries, universal agent rules, or escalation |
 | `PROTOCOLS.md` | Selecting context, writing a trace, or reviewing a change |
 | `TEMPLATES.md` | Creating a task, a decision, a journal line, or a trace block |
 | `VERSION.md` | Recording or changing the harness version |
@@ -39,4 +39,4 @@ references them.
 ## Governance Changes
 
 Changes to `docs/sdd/`, `harness.json`, or the scripts require explicit human approval in both
-profiles, a decision file, and a `VERSION.md` entry. See `AGENTS.md` § Controlled Self-Improvement.
+profiles, a decision file, and a `VERSION.md` entry. See `ROLES.md` § Controlled Self-Improvement.

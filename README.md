@@ -14,12 +14,12 @@ what is the task, what did we decide, what state is everything in, and did the c
 harness.json          active version, profile, and record budgets
 STATUS.md             generated — the whole project state, one file
 JOURNAL.md            append-only, one line per closed task
-docs/sdd/             the harness itself: README HARNESS AGENTS PROTOCOLS TEMPLATES VERSION
+docs/sdd/             the harness itself: README, HARNESS, ROLES, PROTOCOLS, TEMPLATES, VERSION
 docs/project/         this project's own specifications; adopters get `templates/project/`
 docs/tasks/           one file per task, state in the front-matter
 docs/decisions/       one file per decision, generated index
 docs/traces/          team profile only; in solo the trace is inline in the task
-templates/            what an adopter receives: CLAUDE.md, harness.json, JOURNAL.md, project specs, seed task
+templates/            what an adopter receives: AGENTS.md + CLAUDE.md pointer, harness.json, JOURNAL.md, specs, seed task
 scripts/              harness-status.mjs (generate) · harness-lint.mjs (enforce) · harness-init.mjs (install)
 ```
 
@@ -36,7 +36,7 @@ node scripts/harness-init.mjs ../my-app --project=my-app --profile=solo
 ```
 
 That installs `docs/sdd/`, the specification templates as `docs/project/`, the two enforcement
-scripts, `harness.json`, `JOURNAL.md`, and a `CLAUDE.md` that points the agent at `STATUS.md` first —
+scripts, `harness.json`, `JOURNAL.md`, and an `AGENTS.md` that points the agent at `STATUS.md` first (with `CLAUDE.md` a pointer to it) —
 then generates `STATUS.md`, so the result is lint-clean on arrival. Existing files are never
 overwritten without `--force`.
 

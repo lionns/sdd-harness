@@ -58,7 +58,7 @@ test("the installed manifest carries the current version, project, and profile",
 test("the agent entry point and the specification templates arrive, unfilled", () => {
   const dir = target();
   init(dir, "--project=my-app");
-  assert.match(readFileSync(join(dir, "CLAUDE.md"), "utf8"), /STATUS\.md/);
+  assert.match(readFileSync(join(dir, "AGENTS.md"), "utf8"), /STATUS\.md/);
 
   const brief = readFileSync(join(dir, "docs/project/brief.md"), "utf8");
   assert.doesNotMatch(brief, /sdd-harness|SDD harness/, "an adopter must not inherit this repo's brief");
@@ -194,4 +194,21 @@ test("--hooks refuses to clobber an existing .claude/", () => {
   const refused = init(dir, "--project=my-app", "--hooks");
   assert.equal(refused.code, 1);
   assert.match(refused.stderr, /\.claude/, "an adopter's own hooks must never be silently overwritten");
+});
+
+test("AGENTS.md holds the rules and CLAUDE.md only points at it", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=my-app").code, 0);
+
+  const pointer = readFileSync(join(dir, "CLAUDE.md"), "utf8");
+  const lines = pointer.trimEnd().split("\n");
+  assert.ok(lines.length <= 3, `the pointer is ${lines.length} lines — it must never grow rules of its own`);
+  assert.match(pointer, /AGENTS\.md/);
+
+  const rules = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.ok(rules.split("\n").length > 20, "the rules must live in AGENTS.md, not the pointer");
+  for (const phrase of ["red baseline", "STATUS.md", "docs/project/"]) {
+    assert.match(rules, new RegExp(phrase), `AGENTS.md lost "${phrase}" in the move`);
+  }
+  assert.equal(inside(dir, "harness-lint.mjs").code, 0);
 });

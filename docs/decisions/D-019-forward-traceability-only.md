@@ -1,6 +1,6 @@
 # D-019 — Forward traceability is linted; reverse traceability is not
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-08-27
 - Supersedes: none
 - Tasks: T-010

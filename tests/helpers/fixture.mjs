@@ -27,7 +27,7 @@ const created = [];
  * derives its root from `import.meta.url` and exits the process. Copying keeps the governance
  * surface untouched and tests the CLI contract the quality gate actually invokes.
  */
-export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal, sdd = {}, traces = {}, generate = true } = {}) {
+export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal, sdd = {}, traces = {}, project = {}, generate = true } = {}) {
   // realpath: the scripts detect their own entrypoint by comparing `import.meta.url` against
   // `process.argv[1]`, which only agrees on a canonical path. See T-001 § Review.
   const root = realpathSync(mkdtempSync(join(tmpdir(), "harness-fixture-")));
@@ -43,7 +43,7 @@ export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal, sdd
     .join("\n");
   writeFileSync(join(root, "JOURNAL.md"), lines ? `# Journal\n\n${lines}\n` : "# Journal\n");
 
-  for (const [dir, files] of [["docs/tasks", tasks], ["docs/decisions", decisions], ["docs/sdd", sdd], ["docs/traces", traces]]) {
+  for (const [dir, files] of [["docs/tasks", tasks], ["docs/decisions", decisions], ["docs/sdd", sdd], ["docs/traces", traces], ["docs/project", project]]) {
     mkdirSync(join(root, dir), { recursive: true });
     for (const [name, contents] of Object.entries(files)) writeFileSync(join(root, dir, name), contents);
   }
@@ -75,8 +75,18 @@ export function task({ id = "T-001", status: state = "done", ...rest } = {}) {
   const front = Object.entries(meta)
     .map(([k, v]) => `${k}: ${Array.isArray(v) ? `[${v.join(", ")}]` : v}`)
     .join("\n");
-  const trace = state === "ready" ? "" : "\n## Trace\n\n- 2026-08-26 — read: none · did: nothing · checks: none\n";
-  return `---\n${front}\n---\n\n## Scope\n\n- Nothing.\n\n## Acceptance Criteria\n\n- [x] Done.\n${trace}`;
+  const trace = state === "ready" ? "" : "## Trace\n\n- 2026-08-26 — read: none · did: nothing · checks: none";
+  // `## Sources` is required of a closed task (D-019), so the minimal task carries one and a test
+  // that wants to break that rule empties it on purpose.
+  return [
+    `---\n${front}\n---`,
+    "## Sources\n\n- `docs/project/brief.md`",
+    "## Scope\n\n- Nothing.",
+    "## Acceptance Criteria\n\n- [x] Done.",
+    // A closed task must name a check only it could break (D-015), as well as sources (D-019).
+    "## Verification\n\n- Task-specific: nothing to check.",
+    trace,
+  ].filter(Boolean).join("\n\n") + "\n";
 }
 
 /** A VERSION.md declaring the versions a fixture task may claim. */

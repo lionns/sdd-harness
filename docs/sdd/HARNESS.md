@@ -27,7 +27,7 @@ One person plus agents. Roles collapse to **Planner · Implementer · Reviewer**
 
 ### `team`
 
-Multiple people or multiple agent families. All seven roles in `AGENTS.md` apply.
+Multiple people or multiple agent families. All seven roles in `ROLES.md` apply.
 
 - Traces are separate files in `docs/traces/`, one per role per task.
 - Human validation is an explicit gate with a named validator.
@@ -79,7 +79,7 @@ The state lives in the task file front-matter and nowhere else. `STATUS.md` is g
 
 - The goal is one or two concrete sentences.
 - Primary sources are named by path.
-- Acceptance criteria are explicit and testable.
+- Acceptance criteria are explicit and testable, in the grammar `TEMPLATES.md` gives.
 - Scope and out-of-scope are identified.
 - Baseline and final checks are named.
 - Open questions are resolved, or recorded as labelled assumptions.
@@ -112,6 +112,10 @@ Before new implementation, run the configured checks.
 `harness-lint` enforces the mechanical half of the Definition of Done: a `done` task must have a
 journal line for its id, no unchecked acceptance criterion, a `harness:` version that `VERSION.md`
 declares, and — under `team` — a trace file and a named validator (D-013).
+
+Two kinds of check must both be green: the ones an agent iterates against, and at least one that
+exercises the change together with what already exists. The first kind can be made to pass by
+narrowing it, which is why the second is required and why weakening either is a defect.
 
 A change cannot be accepted unless all configured checks pass, task-specific verification passes,
 blocking review findings are resolved, the trace is complete, and required decisions are recorded.

@@ -1,6 +1,6 @@
 # Agent Model Configuration
 
-Which agent and model fills each SDD role in this repo. Role definitions live in `docs/sdd/AGENTS.md`;
+Which agent and model fills each SDD role in this repo. Role definitions live in `docs/sdd/ROLES.md`;
 this file is project configuration.
 
 ## Active Configuration
@@ -33,6 +33,6 @@ This repo runs `solo`; they are hats, not seats.
 
 ## References
 
-- `docs/sdd/AGENTS.md` — role definitions
+- `docs/sdd/ROLES.md` — role definitions
 - `docs/project/quality-gates.md` — the commands every role runs
 - `docs/decisions/D-006-agent-model-assignment.md`

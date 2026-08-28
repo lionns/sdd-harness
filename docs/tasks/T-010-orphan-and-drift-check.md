@@ -1,9 +1,9 @@
 ---
 id: T-010
 title: Catch orphan work and unimplemented requirements in the linter
-status: ready
+status: done
 profile: solo
-harness: 0.3.0
+harness: 0.6.0
 role: Planner
 goal: Make the linter report requirements that no task implements and tasks that cite no source, so the gap between the specification and the work is visible at zero cost per session.
 decisions: [D-019]
@@ -34,14 +34,14 @@ decisions: [D-019]
 
 ## Acceptance Criteria
 
-- [ ] A task citing `FR-99`, absent from `requirements.json`, fails lint naming the id.
-- [ ] A `done` task with an empty `## Sources` section fails lint.
-- [ ] A requirement no task implements appears in the clean-run report and does **not** change the
+- [x] A task citing `FR-99`, absent from `requirements.json`, fails lint naming the id.
+- [x] A `done` task with an empty `## Sources` section fails lint.
+- [x] A requirement no task implements appears in the clean-run report and does **not** change the
       exit code.
-- [ ] Omitting `implements` entirely is valid and produces no output.
-- [ ] The reader tolerates a project with no `requirements.json` at all, as `harness-init` installs
+- [x] Omitting `implements` entirely is valid and produces no output.
+- [x] The reader tolerates a project with no `requirements.json` at all, as `harness-init` installs
       an empty one.
-- [ ] `npm run check` is green, and this repo's own tasks pass without adding fictional links.
+- [x] `npm run check` is green, and this repo's own tasks pass without adding fictional links.
 
 ## Verification
 
@@ -61,9 +61,22 @@ decisions: [D-019]
 
 ## Outcome
 
-- Changes:
-- Files:
-- Baseline result:
-- Final result:
-- Decisions recorded:
-- Follow-up:
+- Changes: tasks may declare `implements:`, linted against the ids `docs/project/*.json` declares; a
+  `done` task needs a non-empty `## Sources`; unimplemented ids are reported without failing.
+- Files: `scripts/lib/harness.mjs`, `scripts/harness-lint.mjs`, `docs/sdd/TEMPLATES.md`,
+  `tests/lint.test.mjs`, `tests/helpers/fixture.mjs`.
+- Baseline result: green — 73/73, lint clean.
+- Final result: green — 81/81, lint clean. The report names 16 unimplemented ids.
+- Decisions recorded: D-019 (accepted).
+- Follow-up: all 16 spec ids are reported as unimplemented, because this repo's requirements were
+  written after its tasks closed. Backfilling `implements:` into closed records would be inventing
+  links; the honest reading is that the report is telling the truth about this repo.
+
+## Trace
+
+- 2026-08-27 — did: added `specIds()`, which walks arbitrary JSON shapes because `requirements.json`
+  nests ids while `user-stories.json` is flat, and tolerates a malformed or absent spec rather than
+  crashing · checks: baseline 73/73 green.
+- 2026-08-27 — did: the `## Sources` rule broke the minimal fixture, fixed in the fixture. Capped
+  the report at five ids plus a count, because a long line is a line people learn to skip ·
+  checks: 81/81, lint clean.

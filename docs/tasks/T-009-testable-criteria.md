@@ -1,9 +1,9 @@
 ---
 id: T-009
 title: Acceptance criteria written so a check can decide them
-status: ready
+status: done
 profile: solo
-harness: 0.3.0
+harness: 0.6.0
 role: Planner
 goal: Adopt a constrained grammar for behavioral acceptance criteria so a criterion states a trigger and an observable result, removing the ambiguity an agent would otherwise resolve by guessing.
 decisions: [D-018]
@@ -32,12 +32,12 @@ decisions: [D-018]
 
 ## Acceptance Criteria
 
-- [ ] `TEMPLATES.md` states the grammar in at most six lines including both examples.
-- [ ] The template makes clear that non-behavioral criteria are exempt, so the grammar does not turn
+- [x] `TEMPLATES.md` states the grammar in at most six lines including both examples.
+- [x] The template makes clear that non-behavioral criteria are exempt, so the grammar does not turn
       "the file exists" into ceremony.
-- [ ] `docs/sdd/` grows by no more than eight lines in total.
-- [ ] T-006's composition criterion, written in the new grammar, still fits the template.
-- [ ] `npm run check` is green.
+- [x] `docs/sdd/` grows by no more than eight lines in total.
+- [x] T-006's composition criterion, written in the new grammar, still fits the template.
+- [x] `npm run check` is green.
 
 ## Verification
 
@@ -58,9 +58,19 @@ decisions: [D-018]
 
 ## Outcome
 
-- Changes:
-- Files:
-- Baseline result:
-- Final result:
-- Decisions recorded:
-- Follow-up:
+- Changes: `TEMPLATES.md` § Acceptance Criteria states the grammar with both examples; the
+  Definition of Ready points at it.
+- Files: `docs/sdd/TEMPLATES.md`, `docs/sdd/HARNESS.md`.
+- Baseline result: green — 73/73, lint clean.
+- Final result: green — 81/81, lint clean.
+- Decisions recorded: D-018 (accepted).
+- Follow-up: none. The grammar stays unlinted on purpose; if criteria stay ambiguous in real
+  projects, the answer is a better example, not a regex.
+
+## Trace
+
+- 2026-08-27 — did: wrote the grammar in six lines with a behavioral and a non-behavioral example,
+  and exempted non-behavioral criteria explicitly so "the file exists" does not become ceremony ·
+  checks: 81/81, lint clean.
+- 2026-08-27 — did: wrote T-006's composition criterion in the new grammar as the test name in
+  `tests/lint.test.mjs`, which is the criterion proving the grammar fits real use.

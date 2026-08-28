@@ -41,6 +41,7 @@ export function plan({ project, profile, adopt = false, root = ROOT }) {
   harness.foundation = adopt ? [] : FOUNDATION_TOPICS;
   const files = [
     ["harness.json", `${JSON.stringify(harness, null, 2)}\n`],
+    ["AGENTS.md", readFileSync(join(root, "templates/AGENTS.md"), "utf8")],
     ["CLAUDE.md", readFileSync(join(root, "templates/CLAUDE.md"), "utf8")],
     ["JOURNAL.md", readFileSync(join(root, "templates/JOURNAL.md"), "utf8")],
   ];
