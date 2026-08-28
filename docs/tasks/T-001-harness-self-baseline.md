@@ -33,12 +33,12 @@ decisions: []
 
 ## Acceptance Criteria
 
-- [ ] `npm test` runs and passes with zero dependencies beyond Node's built-in test runner.
-- [ ] Tests cover: front-matter parsing, section extraction, both renderers, renderer determinism,
+- [x] `npm test` runs and passes with zero dependencies beyond Node's built-in test runner.
+- [x] Tests cover: front-matter parsing, section extraction, both renderers, renderer determinism,
       and at least six distinct `harness-lint` failure modes plus the clean case.
-- [ ] `docs/project/quality-gates.md` names executable commands, no `<!-- command -->` placeholders.
-- [ ] `npm run check` is green end to end.
-- [ ] The task closes the full cycle: Outcome, Review, Trace, journal line, regenerated `STATUS.md`.
+- [x] `docs/project/quality-gates.md` names executable commands, no `<!-- command -->` placeholders.
+- [x] `npm run check` is green end to end.
+- [x] The task closes the full cycle: Outcome, Review, Trace, journal line, regenerated `STATUS.md`.
 
 ## Verification
 

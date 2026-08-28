@@ -2,7 +2,7 @@
 
 # Status — sdd-harness
 
-Harness `0.2.1` · profile `solo`
+Harness `0.4.0` · profile `solo`
 
 ## Tasks
 
@@ -10,6 +10,10 @@ Harness `0.2.1` · profile `solo`
 |---|---|---|
 | [T-001](docs/tasks/T-001-harness-self-baseline.md) | `done` | Give this repo the green baseline it demands of every project it is copied into — real quality gates and an automated test suite for the two scripts that enforce the harness. |
 | [T-002](docs/tasks/T-002-script-path-resolution.md) | `done` | Make the two scripts work when the repo path contains a symlink or a space, and stop the docs/sdd line count from disagreeing with the linter's own. |
+| [T-003](docs/tasks/T-003-adoption-templates.md) | `done` | Give adopters a pristine `templates/` tree to copy — including the `CLAUDE.md` entry point the harness needs to take effect — and let `docs/project/` hold this repo's real specifications instead of a mix of both. |
+| [T-004](docs/tasks/T-004-closure-integrity.md) | `done` | Make `harness-lint` reject the ways a task can currently claim `done` without the records the Definition of Done requires, and give the `team` profile the enforcement that today exists only in prose. |
+| [T-005](docs/tasks/T-005-harness-init.md) | `done` | Replace the five manual copy steps in `README.md` with one command that installs the harness into a target repository and leaves it lint-clean. |
+| [T-011](docs/tasks/T-011-project-inception.md) | `done` | Give the harness a project-level inception phase that produces decisions instead of prose, enforced by the linter, so a new project cannot start work on an architecture nobody chose and an adopted one records what it already does. |
 
 ## Next
 
@@ -21,7 +25,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-08-27 | T-011 | done | inception gate: foundation decisions before task one, greenfield and brownfield | 14 files | tests 64/64, lint clean | D-020
+- 2026-08-27 | T-005 | done | harness-init installs the harness in one command | 4 files | tests 55/55, check clean | D-014
+- 2026-08-27 | T-004 | done | linter enforces closure integrity and the team profile | 8 files | tests 55/55, check clean | D-013
+- 2026-08-27 | T-003 | done | templates/ split from this repo's specs, CLAUDE.md shipped | 21 files | tests 55/55, check clean | D-012
 - 2026-08-26 | T-002 | done | canonical path resolution in scripts, 0.2.1 | 11 files | tests 39/39, check clean | D-011
-- 2026-08-26 | T-001 | done | harness baseline: 32 tests over scripts, real quality gates | 7 files | tests 32/32, check clean | -
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

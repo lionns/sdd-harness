@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.2.1` · Status: `Operational` · Date: 2026-08-26
+Version: `0.4.0` · Status: `Operational` · Date: 2026-08-27
 
 The active version and profile for a project live in its `harness.json`. This file is the changelog
 and the versioning rules.
@@ -20,6 +20,32 @@ and the versioning rules.
 - A project may stay on an older version. `0.1.0` remains valid for projects that have not migrated.
 
 ## Changelog
+
+### 0.4.0 — 2026-08-27
+
+Gives the harness a project inception phase. Architecture, design, and test strategy become accepted
+decisions before task one, instead of prose an agent fills in and the next session trusts. D-020.
+
+- **Foundation gate.** `harness.json` lists `foundation` topics; each needs one accepted decision
+  carrying `- Foundation: <topic>`. `harness-lint` fails while any task is past `ready` and a topic
+  is unsettled. An absent or empty list disables the gate, so 0.3.0 projects upgrade unchanged.
+- **`harness-init --adopt`.** A brownfield install declares no topics and ships `T-001`, the task
+  that records what the code already decides and then declares them.
+- **Greenfield installs** declare the default seven, so the gate is on before the first task moves.
+
+### 0.3.0 — 2026-08-27
+
+Makes adoption one command and makes `done` a claim the tooling checks. D-012, D-013, D-014.
+
+- **`templates/`** (D-012). Adopters copy pristine templates plus the `CLAUDE.md` entry point the
+  harness needs to take effect. `docs/project/` is now this repo's own filled specification.
+- **Closure integrity** (D-013). `harness-lint` rejects a `done` task with no journal line for its
+  id, with an unchecked acceptance criterion, or with a `harness:` version this file never declared.
+- **`team` is enforced** (D-013). A task past `ready` needs a trace file in `docs/traces/`, whose
+  name shape and 25-line budget are linted; a `done` task needs a `## Validation` section naming a
+  validator. Previously all of this lived only in prose.
+- **`harness-init`** (D-014). `node scripts/harness-init.mjs <target> --project=<name>` installs the
+  harness and leaves the result lint-clean. Refuses to overwrite without `--force`.
 
 ### 0.2.1 — 2026-08-26
 

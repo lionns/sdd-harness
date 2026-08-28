@@ -1,4 +1,75 @@
 {
-  "functional": [],
-  "nonFunctional": []
+  "functional": [
+    {
+      "id": "FR-1",
+      "statement": "A session reads one generated file, STATUS.md, to know the state of every task, decision, and recent closure.",
+      "sources": [
+        "scripts/harness-status.mjs"
+      ]
+    },
+    {
+      "id": "FR-2",
+      "statement": "Record budgets and record shape are enforced by an executable check that exits non-zero on violation, not by prose.",
+      "sources": [
+        "scripts/harness-lint.mjs",
+        "D-009"
+      ]
+    },
+    {
+      "id": "FR-3",
+      "statement": "A task cannot be recorded done without the records the Definition of Done requires: a journal line, satisfied acceptance criteria, and the trace its profile demands.",
+      "sources": [
+        "D-013"
+      ]
+    },
+    {
+      "id": "FR-4",
+      "statement": "The harness declares a version and a profile per project, and a project may stay on an older version.",
+      "sources": [
+        "harness.json",
+        "docs/sdd/VERSION.md"
+      ]
+    },
+    {
+      "id": "FR-5",
+      "statement": "Installing the harness into a repository is one command that leaves the result lint-clean.",
+      "sources": [
+        "scripts/harness-init.mjs",
+        "D-014"
+      ]
+    },
+    {
+      "id": "FR-6",
+      "statement": "Adopters receive pristine specification templates, never this repo own specifications.",
+      "sources": [
+        "templates/",
+        "D-012"
+      ]
+    }
+  ],
+  "nonFunctional": [
+    {
+      "id": "NFR-1",
+      "statement": "Zero runtime and dev dependencies; Node >= 24 built-ins only."
+    },
+    {
+      "id": "NFR-2",
+      "statement": "Generation is deterministic: a second run produces no diff."
+    },
+    {
+      "id": "NFR-3",
+      "statement": "Scripts work from a repository path containing a space or a symlink.",
+      "sources": [
+        "D-011"
+      ]
+    },
+    {
+      "id": "NFR-4",
+      "statement": "docs/sdd/ stays within 600 lines in total; consolidation beats addition."
+    },
+    {
+      "id": "NFR-5",
+      "statement": "The linter reports every violation in one run, never only the first."
+    }
+  ]
 }

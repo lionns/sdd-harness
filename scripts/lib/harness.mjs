@@ -9,6 +9,11 @@ export const TASK_STATES = ["ready", "doing", "review", "blocked", "done", "supe
 export const DECISION_STATES = ["proposed", "accepted", "superseded"];
 export const OPEN_STATES = ["ready", "doing", "review", "blocked"];
 
+// The one-way doors: choices a project pays dearly to reverse, so they are settled before task one
+// and recorded as decisions rather than deduced per session (D-020). Everything else is decided per
+// task, on evidence. A project trims this list in `harness.json`; a headless one drops `interface`.
+export const FOUNDATION_TOPICS = ["runtime", "data", "boundaries", "identity", "deploy", "tests", "interface"];
+
 /**
  * True when `moduleUrl` is the script Node was asked to run.
  *
@@ -80,7 +85,8 @@ export function decisions(root = ROOT) {
     const status = f.text.match(/^-\s*Status:\s*(\S+)/m)?.[1]?.trim().toLowerCase() ?? "";
     const date = f.text.match(/^-\s*Date:\s*(\S+)/m)?.[1]?.trim() ?? "-";
     const supersedes = f.text.match(/^-\s*Supersedes:\s*(.+)$/m)?.[1]?.trim() ?? "none";
-    return { ...f, id: f.name.slice(0, 5), title, status, date, supersedes };
+    const foundation = f.text.match(/^-\s*Foundation:\s*(\S+)/m)?.[1]?.trim().toLowerCase() ?? null;
+    return { ...f, id: f.name.slice(0, 5), title, status, date, supersedes, foundation };
   });
 }
 
@@ -91,6 +97,22 @@ export function journal(root = ROOT) {
     .split(/\r?\n/)
     .map((line, i) => ({ line: line.trim(), number: i + 1 }))
     .filter((e) => e.line && !/^(#|>|<!--)/.test(e.line));
+}
+
+export function traces(root = ROOT) {
+  return listMarkdown(join(root, "docs/traces"));
+}
+
+/**
+ * The versions `docs/sdd/VERSION.md` declares, read from its `### x.y.z` changelog headings.
+ *
+ * Empty when the file is missing or declares none — a repo that has dropped the changelog cannot be
+ * held to it, so the caller skips the check rather than failing every task (T-004).
+ */
+export function knownVersions(root = ROOT) {
+  const path = join(root, "docs/sdd/VERSION.md");
+  if (!existsSync(path)) return [];
+  return [...readFileSync(path, "utf8").matchAll(/^###\s+(\d+\.\d+\.\d+)/gm)].map((m) => m[1]);
 }
 
 export function sddDocLines(root = ROOT) {

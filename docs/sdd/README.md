@@ -38,7 +38,7 @@ Normative definitions are in `HARNESS.md`.
 
 Read only what the task touches, from `docs/project/`: `brief.md`, `requirements.json`,
 `user-stories.json`, `acceptance-criteria.json`, `architecture.md`, `design-handoff.md`,
-`data-model.md`, `quality-gates.md`.
+`data-model.md`, `quality-gates.md`, `agent-config.md`.
 
 ## Decisions
 

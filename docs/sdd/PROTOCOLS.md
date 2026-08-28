@@ -51,7 +51,8 @@ It never replaces the task, the review, or a decision.
 - **`solo`**: one `## Trace` block at the bottom of the task file. Append one dated sub-entry per
   working round. Max 25 lines total — when it fills up, compress the older rounds into one line.
 - **`team`**: one file per role per task, `docs/traces/<YYYY-MM-DD>_<task-id>_<role>.md`, using the
-  same block structure. Same 25-line budget.
+  same block structure. Same 25-line budget. The filename shape is linted, and a task past `ready`
+  without one fails the final gate (D-013).
 
 Required content is in `TEMPLATES.md` § Trace Block: sources read, actions, files changed, checks
 run and their results, assumptions, blockers, decisions, follow-ups.

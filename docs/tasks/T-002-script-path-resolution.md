@@ -32,11 +32,11 @@ decisions: [D-011]
 
 ## Acceptance Criteria
 
-- [ ] `node <symlinked-path>/scripts/harness-status.mjs` generates its files instead of exiting 0.
-- [ ] Both scripts run correctly from a path containing a space.
-- [ ] `sddDocLines` and the linter's line counting agree; `docs/sdd/` reports 529, not 535.
-- [ ] Regression tests cover all three, and fail against the pre-fix scripts.
-- [ ] `npm run check` green; `D-011` accepted and indexed; `VERSION.md` has a `0.2.1` entry.
+- [x] `node <symlinked-path>/scripts/harness-status.mjs` generates its files instead of exiting 0.
+- [x] Both scripts run correctly from a path containing a space.
+- [x] `sddDocLines` and the linter's line counting agree; `docs/sdd/` reports 529, not 535.
+- [x] Regression tests cover all three, and fail against the pre-fix scripts.
+- [x] `npm run check` green; `D-011` accepted and indexed; `VERSION.md` has a `0.2.1` entry.
 
 ## Verification
 

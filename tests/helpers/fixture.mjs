@@ -27,7 +27,7 @@ const created = [];
  * derives its root from `import.meta.url` and exits the process. Copying keeps the governance
  * surface untouched and tests the CLI contract the quality gate actually invokes.
  */
-export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal = "", sdd = {}, generate = true } = {}) {
+export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal, sdd = {}, traces = {}, generate = true } = {}) {
   // realpath: the scripts detect their own entrypoint by comparing `import.meta.url` against
   // `process.argv[1]`, which only agrees on a canonical path. See T-001 § Review.
   const root = realpathSync(mkdtempSync(join(tmpdir(), "harness-fixture-")));
@@ -35,9 +35,15 @@ export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal = ""
 
   cpSync(SOURCE_SCRIPTS, join(root, "scripts"), { recursive: true });
   writeFileSync(join(root, "harness.json"), `${JSON.stringify({ ...DEFAULT_CONFIG, ...config }, null, 2)}\n`);
-  writeFileSync(join(root, "JOURNAL.md"), journal ? `# Journal\n\n${journal}\n` : "# Journal\n");
+  // Closure integrity (D-013) means a `done` task needs a journal line. Deriving it keeps every test
+  // breaking exactly one rule; pass `journal` explicitly to break this one on purpose.
+  const lines = journal ?? Object.values(tasks)
+    .filter((t) => /^status:\s*done$/m.test(t))
+    .map((t) => `2026-08-26 | ${t.match(/^id:\s*(\S+)$/m)?.[1]} | done | fixture | 1 file | ok | -`)
+    .join("\n");
+  writeFileSync(join(root, "JOURNAL.md"), lines ? `# Journal\n\n${lines}\n` : "# Journal\n");
 
-  for (const [dir, files] of [["docs/tasks", tasks], ["docs/decisions", decisions], ["docs/sdd", sdd]]) {
+  for (const [dir, files] of [["docs/tasks", tasks], ["docs/decisions", decisions], ["docs/sdd", sdd], ["docs/traces", traces]]) {
     mkdirSync(join(root, dir), { recursive: true });
     for (const [name, contents] of Object.entries(files)) writeFileSync(join(root, dir, name), contents);
   }
@@ -70,10 +76,17 @@ export function task({ id = "T-001", status: state = "done", ...rest } = {}) {
     .map(([k, v]) => `${k}: ${Array.isArray(v) ? `[${v.join(", ")}]` : v}`)
     .join("\n");
   const trace = state === "ready" ? "" : "\n## Trace\n\n- 2026-08-26 — read: none · did: nothing · checks: none\n";
-  return `---\n${front}\n---\n\n## Scope\n\n- Nothing.\n${trace}`;
+  return `---\n${front}\n---\n\n## Scope\n\n- Nothing.\n\n## Acceptance Criteria\n\n- [x] Done.\n${trace}`;
 }
 
+/** A VERSION.md declaring the versions a fixture task may claim. */
+export const version = (...list) => `# Harness Version\n\n## Changelog\n${list.map((v) => `\n### ${v} — 2026-08-26\n`).join("")}`;
+
+/** A minimal trace file for the team profile. */
+export const trace = (id = "T-001") => `## Trace\n\n- 2026-08-26 — role: Implementer\n  - did: nothing for ${id}\n`;
+
 /** A minimal decision file that satisfies every lint rule. */
-export function decision({ id = "D-001", state = "accepted", supersedes = "none" } = {}) {
-  return `# ${id} — Fixture decision\n\n- Status: ${state}\n- Date: 2026-08-26\n- Supersedes: ${supersedes}\n- Tasks: -\n\n## Decision\n\nSomething.\n`;
+export function decision({ id = "D-001", state = "accepted", supersedes = "none", foundation } = {}) {
+  const topic = foundation ? `\n- Foundation: ${foundation}` : "";
+  return `# ${id} — Fixture decision\n\n- Status: ${state}\n- Date: 2026-08-26\n- Supersedes: ${supersedes}\n- Tasks: -${topic}\n\n## Decision\n\nSomething.\n`;
 }

@@ -2,7 +2,7 @@ import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { writeFileSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
-import { makeRepo, cleanup, lint, task, decision } from "./helpers/fixture.mjs";
+import { makeRepo, cleanup, lint, task, decision, version, trace } from "./helpers/fixture.mjs";
 
 after(cleanup);
 
@@ -121,4 +121,129 @@ test("every violation is reported in one run, not just the first", () => {
   }));
   assert.equal(code, 1);
   assert.match(stderr, /harness-lint: 3 problem\(s\)/);
+});
+
+test("a done task with no journal line for its id is rejected", () => {
+  rejects(makeRepo({ tasks: { "T-001-a.md": task() }, journal: "2026-08-26 | T-777 | done | other | 1 file | ok | -" }),
+    "docs/tasks/T-001-a.md", /status is done but JOURNAL\.md has no line for T-001/);
+});
+
+test("a done task with unchecked acceptance criteria is rejected, but an open task is not", () => {
+  const unchecked = task().replace("- [x] Done.", "- [ ] Not verified.\n- [ ] Nor this.");
+  rejects(makeRepo({ tasks: { "T-001-a.md": unchecked } }),
+    "docs/tasks/T-001-a.md", /status is done but 2 acceptance criteria are still unchecked/);
+
+  const open = unchecked.replace("status: done", "status: doing");
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": open } })).code, 0, "an unchecked box is fine before done");
+});
+
+test("a harness version VERSION.md never declared is rejected", () => {
+  rejects(makeRepo({ tasks: { "T-001-a.md": task({ harness: "9.9.9" }) }, sdd: { "VERSION.md": version("0.2.0") } }),
+    "docs/tasks/T-001-a.md", /harness "9\.9\.9" is not a version in docs\/sdd\/VERSION\.md \(0\.2\.0\)/);
+
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": task() }, sdd: { "VERSION.md": version("0.1.0", "0.2.0") } })).code,
+    0, "a declared version passes");
+});
+
+test("the version rule is skipped when VERSION.md declares nothing", () => {
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": task({ harness: "9.9.9" }) } })).code,
+    0, "a repo with no changelog cannot be held to it");
+});
+
+test("under team, a task past `ready` needs a trace file", () => {
+  const config = { profile: "team" };
+  const doing = task({ status: "doing", profile: "team" });
+  rejects(makeRepo({ config, tasks: { "T-001-a.md": doing } }),
+    "docs/tasks/T-001-a.md", /team profile requires a trace file at docs\/traces\/<YYYY-MM-DD>_T-001_<role>\.md/);
+
+  assert.equal(lint(makeRepo({ config, tasks: { "T-001-a.md": doing }, traces: { "2026-08-26_T-001_implementer.md": trace() } })).code,
+    0, "a matching trace file satisfies the rule");
+
+  assert.equal(lint(makeRepo({ config, tasks: { "T-001-a.md": task({ status: "ready", profile: "team" }) } })).code,
+    0, "a `ready` task needs no trace yet");
+});
+
+test("under team, a done task needs a `## Validation` section naming a validator", () => {
+  const config = { profile: "team" };
+  const traces = { "2026-08-26_T-001_implementer.md": trace() };
+  const done = task({ profile: "team" });
+  rejects(makeRepo({ config, tasks: { "T-001-a.md": done }, traces }),
+    "docs/tasks/T-001-a.md", /team profile requires a `## Validation` section with a `- Validated by:` line/);
+
+  const empty = done.replace("## Trace", "## Validation\n\n- Validated by:\n\n## Trace");
+  rejects(makeRepo({ config, tasks: { "T-001-a.md": empty }, traces }),
+    "docs/tasks/T-001-a.md", /team profile requires a `## Validation` section/);
+
+  const named = done.replace("## Trace", "## Validation\n\n- Validated by: A Human\n- Date: 2026-08-26\n\n## Trace");
+  assert.equal(lint(makeRepo({ config, tasks: { "T-001-a.md": named }, traces })).code, 0);
+});
+
+test("under solo, the team rules do not fire", () => {
+  assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": task({ status: "doing" }) } })).code,
+    0, "solo needs no trace file and no validator");
+});
+
+test("trace files are checked for filename shape and budget", () => {
+  rejects(makeRepo({ config: { profile: "team" }, traces: { "implementer-notes.md": trace() } }),
+    "docs/traces/implementer-notes.md", /filename must match <YYYY-MM-DD>_<T-###>_<role>\.md/);
+
+  rejects(makeRepo({ config: { profile: "team" }, traces: { "2026-08-26_T-001_implementer.md": "- a round\n".repeat(30) } }),
+    "docs/traces/2026-08-26_T-001_implementer.md", /30 lines, budget is 25 — compress older rounds/);
+});
+
+// --- Inception gate (D-020) ---
+
+test("a declared foundation topic blocks any task past ready until an accepted decision settles it", () => {
+  const config = { foundation: ["runtime"] };
+  const doing = { "T-001-a.md": task({ status: "doing" }) };
+  rejects(makeRepo({ config, tasks: doing }), "harness.json",
+    /1 task\(s\) past ready while the foundation is unsettled: runtime/);
+
+  assert.equal(lint(makeRepo({ config, tasks: { "T-001-a.md": task({ status: "ready" }) } })).code,
+    0, "the gate fires on started work, not on a backlog");
+
+  rejects(makeRepo({ config, tasks: doing, decisions: { "D-001-a.md": decision({ state: "proposed", foundation: "runtime" }) } }),
+    "harness.json", /unsettled: runtime/);
+
+  assert.equal(lint(makeRepo({ config, tasks: doing, decisions: { "D-001-a.md": decision({ foundation: "runtime" }) } })).code,
+    0, "an accepted decision settles the topic");
+});
+
+test("the gate names every unsettled topic at once, so one run tells you the whole cost", () => {
+  const root = makeRepo({ config: { foundation: ["runtime", "data", "tests"] }, tasks: { "T-001-a.md": task({ status: "doing" }) } });
+  const { stderr } = lint(root);
+  assert.match(stderr, /unsettled: runtime, data, tests/);
+});
+
+test("a foundation topic outside the declared list is a typo, not a new topic", () => {
+  rejects(makeRepo({ config: { foundation: ["runtime"] }, decisions: { "D-001-a.md": decision({ foundation: "runitme" }) } }),
+    "docs/decisions/D-001-a.md", /foundation topic "runitme" is not one of runtime in harness.json/);
+});
+
+test("two accepted decisions claiming one topic are ambiguous", () => {
+  rejects(makeRepo({
+    config: { foundation: ["runtime"] },
+    decisions: {
+      "D-001-a.md": decision({ id: "D-001", foundation: "runtime" }),
+      "D-002-b.md": decision({ id: "D-002", foundation: "runtime" }),
+    },
+  }), "docs/decisions/", /foundation topic "runtime" is settled by 2 accepted decisions/);
+});
+
+test("no declared foundation means no gate, so a 0.3.0 project survives the upgrade", () => {
+  const doing = { "T-001-a.md": task({ status: "doing" }) };
+  assert.equal(lint(makeRepo({ tasks: doing })).code, 0, "absent list");
+  assert.equal(lint(makeRepo({ config: { foundation: [] }, tasks: doing })).code, 0, "empty list");
+
+  // With the gate off a topic marker is inert, not an error: the brownfield task writes the
+  // decisions first and declares the list last.
+  assert.equal(lint(makeRepo({ config: { foundation: [] }, decisions: { "D-001-a.md": decision({ foundation: "runtime" }) } })).code, 0);
+});
+
+test("a superseded decision stops settling its topic", () => {
+  rejects(makeRepo({
+    config: { foundation: ["runtime"] },
+    tasks: { "T-001-a.md": task({ status: "doing" }) },
+    decisions: { "D-001-a.md": decision({ state: "superseded", foundation: "runtime" }) },
+  }), "harness.json", /unsettled: runtime/);
 });

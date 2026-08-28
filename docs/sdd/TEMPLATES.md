@@ -11,7 +11,7 @@ id: T-001
 title: Short title
 status: ready
 profile: solo
-harness: 0.2.0
+harness: 0.3.0
 role: Implementer
 goal: One or two concrete sentences describing the desired outcome.
 decisions: []
@@ -62,6 +62,13 @@ Filled in as the task progresses; overwritten, not appended.
 
 - Severity · `file:line` · issue · impact · recommendation
 
+## Validation
+
+`team` only — required before `done`, and linted.
+
+- Validated by: Name
+- Date: YYYY-MM-DD
+
 ## Trace
 
 - YYYY-MM-DD — read: … · did: … · checks: … · result: …
@@ -79,6 +86,7 @@ Filled in as the task progresses; overwritten, not appended.
 - Date: YYYY-MM-DD
 - Supersedes: D-002 | none
 - Tasks: T-003
+- Foundation: runtime        # only when this decision settles a topic — HARNESS.md § Inception
 
 ## Context
 

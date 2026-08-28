@@ -10,9 +10,6 @@ and domain details belong in `docs/project/`.
 - Changes stay small enough to review and verify independently.
 - Decisions that constrain future work are recorded when made, one file each.
 - Reviews prioritize correctness, regressions, security, maintainability, and test coverage.
-- New implementation starts only from a green baseline, unless the task is to repair that baseline.
-- Changes are accepted only when final configured checks are green.
-- Implementation does not silently expand scope.
 - Records are budgeted. A record that exceeds its budget is a defect, not a thorough job.
 - Context is selected deliberately: enough evidence to avoid guessing, nothing more.
 
@@ -39,9 +36,28 @@ Multiple people or multiple agent families. All seven roles in `AGENTS.md` apply
 Both profiles keep the baseline gate and the final acceptance gate. Those gates prevent building on
 a broken tree and cost no documentation.
 
+## Inception
+
+`harness.json` lists the `foundation` topics a project settles before task one. Empty or absent
+disables the gate. The default seven are the one-way doors — the choices expensive to reverse:
+
+`runtime` · `data` · `boundaries` · `identity` · `deploy` · `tests` · `interface`
+
+Each is settled by exactly one **accepted** decision carrying `- Foundation: <topic>`. A topic the
+project does not have is deleted from the list, never recorded as not applicable. A topic the
+evidence does not yet settle is an accepted decision *to defer*, carrying a `- Trigger:` line that
+names what will force the choice: a deferral is a record, silence is not. Greenfield decides;
+brownfield records what the code already does and cites the path proving it.
+
+Nothing outside the list is settled up front — everything else is decided per task, on evidence,
+which is what keeps inception from becoming a specification phase. `harness-lint` fails while any
+task is past `ready` and a listed topic is unsettled, and only `accepted` counts, so the approval
+moment lands where reversal is expensive.
+
 ## Flow
 
-1. Define or update the project specifications that the work depends on.
+1. Settle the foundation if this project has not, then define or update the project specifications
+   the work depends on.
 2. Create a task file from `TEMPLATES.md` in `docs/tasks/`.
 3. Confirm Definition of Ready.
 4. Run the baseline checks from `docs/project/quality-gates.md`. Proceed only if green.
@@ -92,6 +108,10 @@ Before new implementation, run the configured checks.
 - Reprioritizing is a human call; approving unrelated implementation on a red baseline is not.
 
 ## Final Acceptance Gate
+
+`harness-lint` enforces the mechanical half of the Definition of Done: a `done` task must have a
+journal line for its id, no unchecked acceptance criterion, a `harness:` version that `VERSION.md`
+declares, and — under `team` — a trace file and a named validator (D-013).
 
 A change cannot be accepted unless all configured checks pass, task-specific verification passes,
 blocking review findings are resolved, the trace is complete, and required decisions are recorded.

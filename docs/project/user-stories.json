@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "id": "US-1",
+    "as": "a solo developer working with coding agents",
+    "want": "the agent to start each session from one file that states the whole project state",
+    "so": "I do not re-explain context or discover stale assumptions mid-task",
+    "criteria": [
+      "STATUS.md is generated from the records and never hand-edited",
+      "CLAUDE.md names it as the first file to read"
+    ]
+  },
+  {
+    "id": "US-2",
+    "as": "a solo developer",
+    "want": "records that cannot quietly grow past their budget",
+    "so": "the harness stays cheaper than the value it returns",
+    "criteria": [
+      "Budgets live in harness.json and are enforced by harness-lint",
+      "Exceeding a budget fails the final gate"
+    ]
+  },
+  {
+    "id": "US-3",
+    "as": "a reviewer",
+    "want": "a done task to be a checkable claim",
+    "so": "I can trust the journal without re-reading every task file",
+    "criteria": [
+      "A done task has a journal line, no unchecked acceptance criterion, and its profile trace"
+    ]
+  },
+  {
+    "id": "US-4",
+    "as": "someone starting a new project",
+    "want": "to install the harness with one command",
+    "so": "adoption is not a manual checklist I can get wrong",
+    "criteria": [
+      "harness-init installs into a target directory",
+      "The result passes harness-status then harness-lint",
+      "Existing files are never overwritten without --force"
+    ]
+  },
+  {
+    "id": "US-5",
+    "as": "a small team or multiple agent families",
+    "want": "the team profile to be enforced, not merely described",
+    "so": "traces and validation are real gates",
+    "criteria": [
+      "Under team, a task past ready requires a trace file",
+      "Under team, a done task requires a named validator"
+    ]
+  }
+]

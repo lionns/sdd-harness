@@ -1,4 +1,13 @@
 {
-  "global": [],
-  "crossCutting": []
+  "global": [
+    "npm run check is green: tests pass, STATUS.md regenerates to no diff, harness-lint exits 0.",
+    "Any new behavior in scripts/ ships with a test in tests/.",
+    "No dependency is added to package.json."
+  ],
+  "crossCutting": [
+    "Changes to docs/sdd/, harness.json, or scripts/ carry a decision file and, when behavior changes, a VERSION.md entry.",
+    "STATUS.md and docs/decisions/README.md are never hand-edited.",
+    "Every record stays inside its budget; hitting one means splitting the record, not raising the limit.",
+    "The harness passes the gates it imposes on the projects that adopt it."
+  ]
 }

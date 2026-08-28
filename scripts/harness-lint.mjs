@@ -6,7 +6,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import {
-  ROOT, config, tasks, decisions, journal, section, sddDocLines, lineCount,
+  ROOT, config, tasks, decisions, journal, traces, knownVersions, section, sddDocLines, lineCount,
   TASK_STATES, DECISION_STATES,
 } from "./lib/harness.mjs";
 import { renderStatus, renderDecisionIndex } from "./harness-status.mjs";
@@ -24,6 +24,10 @@ if (!PROFILES.includes(cfg.profile)) {
 }
 
 const decisionIds = new Set(decisions().map((d) => d.id));
+const journalIds = new Set(journal().map((e) => e.line.split("|")[1]?.trim()));
+const versions = knownVersions();
+const traceFiles = traces();
+const TRACE_NAME = /^\d{4}-\d{2}-\d{2}_([A-Z]+-\d+)_[a-z-]+\.md$/;
 
 for (const task of tasks()) {
   const where = `docs/tasks/${task.name}`;
@@ -58,6 +62,45 @@ for (const task of tasks()) {
   if (trace && trace.length > budgets.traceBlockLines) {
     fail(where, `trace block is ${trace.length} lines, budget is ${budgets.traceBlockLines} — compress older rounds`);
   }
+
+  // A version the changelog never declared makes the front-matter unverifiable, so tasks could claim
+  // rules that never existed. Skipped entirely when VERSION.md declares nothing (D-013).
+  if (task.meta.harness && versions.length && !versions.includes(task.meta.harness)) {
+    fail(where, `harness "${task.meta.harness}" is not a version in docs/sdd/VERSION.md (${versions.join(", ")})`);
+  }
+
+  // Closure integrity: `done` is a claim the Definition of Done makes checkable (D-013).
+  if (task.meta.status === "done") {
+    if (task.meta.id && !journalIds.has(task.meta.id)) {
+      fail(where, `status is done but JOURNAL.md has no line for ${task.meta.id}`);
+    }
+    const unchecked = (section(task.text, "Acceptance Criteria") ?? []).filter((l) => /^\s*-\s*\[ \]/.test(l));
+    if (unchecked.length) {
+      fail(where, `status is done but ${unchecked.length} acceptance criteria are still unchecked`);
+    }
+  }
+
+  if (cfg.profile === "team") {
+    const own = traceFiles.filter((t) => TRACE_NAME.exec(t.name)?.[1] === task.meta.id);
+    if (task.meta.status !== "ready" && own.length === 0) {
+      fail(where, `team profile requires a trace file at docs/traces/<YYYY-MM-DD>_${task.meta.id}_<role>.md`);
+    }
+    const validation = section(task.text, "Validation") ?? [];
+    if (task.meta.status === "done" && !/^-\s*Validated by:\s*\S/m.test(validation.join("\n"))) {
+      fail(where, "team profile requires a `## Validation` section with a `- Validated by:` line");
+    }
+  }
+}
+
+for (const t of traceFiles) {
+  const where = `docs/traces/${t.name}`;
+  if (!TRACE_NAME.test(t.name)) {
+    fail(where, "filename must match <YYYY-MM-DD>_<T-###>_<role>.md");
+  }
+  const lines = lineCount(t.text);
+  if (lines > budgets.traceBlockLines) {
+    fail(where, `${lines} lines, budget is ${budgets.traceBlockLines} — compress older rounds`);
+  }
 }
 
 for (const decision of decisions()) {
@@ -75,6 +118,32 @@ for (const decision of decisions()) {
   if (lines > budgets.decisionFileLines) {
     fail(where, `${lines} lines exceeds the ${budgets.decisionFileLines}-line budget`);
   }
+}
+
+// Inception gate (D-020). The foundation topics a project declares must each be settled by one
+// accepted decision before any task leaves `ready`. An absent or empty list disables the gate, so a
+// project that predates 0.4.0 keeps working and a brownfield adopter can record before declaring.
+const foundation = Array.isArray(cfg.foundation) ? cfg.foundation : [];
+const settled = new Map();
+for (const decision of decisions()) {
+  if (!decision.foundation) continue;
+  const where = `docs/decisions/${decision.name}`;
+  if (foundation.length && !foundation.includes(decision.foundation)) {
+    fail(where, `foundation topic "${decision.foundation}" is not one of ${foundation.join(" | ")} in harness.json`);
+    continue;
+  }
+  if (decision.status !== "accepted") continue;
+  settled.set(decision.foundation, [...(settled.get(decision.foundation) ?? []), decision.name]);
+}
+for (const [topic, files] of settled) {
+  if (files.length > 1) {
+    fail("docs/decisions/", `foundation topic "${topic}" is settled by ${files.length} accepted decisions (${files.join(", ")}) — supersede one`);
+  }
+}
+const started = tasks().filter((t) => t.meta?.status && t.meta.status !== "ready");
+const missing = foundation.filter((topic) => !settled.has(topic));
+if (started.length && missing.length) {
+  fail("harness.json", `${started.length} task(s) past ready while the foundation is unsettled: ${missing.join(", ")} — record each as an accepted decision carrying \`- Foundation: <topic>\` before implementing (D-020)`);
 }
 
 const JOURNAL_FIELDS = 7;

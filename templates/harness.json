@@ -1,7 +1,7 @@
 {
   "harness": "0.4.0",
   "profile": "solo",
-  "project": "sdd-harness",
+  "project": "CHANGE_ME",
   "foundation": [],
   "budgets": {
     "taskFileLines": 120,

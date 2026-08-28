@@ -18,3 +18,7 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-009](D-009-enforced-record-budgets.md) | 2026-08-25 | Record budgets are enforced, not advised | `accepted` | partially D-002 |
 | [D-010](D-010-generated-status-and-journal.md) | 2026-08-25 | `STATUS.md` generated, `JOURNAL.md` append-only | `accepted` | partially D-005 |
 | [D-011](D-011-canonical-path-resolution.md) | 2026-08-26 | Scripts resolve paths canonically | `accepted` | none |
+| [D-012](D-012-adoption-templates.md) | 2026-08-27 | Adoption templates live in `templates/`, not `docs/project/` | `accepted` | none |
+| [D-013](D-013-closure-integrity.md) | 2026-08-27 | Closure integrity is linted, and `team` is enforced | `accepted` | none |
+| [D-014](D-014-bootstrap-script.md) | 2026-08-27 | Adoption is one command, not five manual steps | `accepted` | none |
+| [D-020](D-020-foundation-before-task-one.md) | 2026-08-27 | The foundation is settled before task one, as decisions | `accepted` | none |
