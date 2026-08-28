@@ -2,7 +2,13 @@
   "harness": "0.4.0",
   "profile": "solo",
   "project": "sdd-harness",
-  "foundation": [],
+  "foundation": [
+    "runtime",
+    "data",
+    "boundaries",
+    "deploy",
+    "tests"
+  ],
   "budgets": {
     "taskFileLines": 120,
     "traceBlockLines": 25,

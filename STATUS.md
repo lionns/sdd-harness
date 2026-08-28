@@ -19,6 +19,7 @@ Harness `0.4.0` · profile `solo`
 | [T-004](docs/tasks/T-004-closure-integrity.md) | `done` | Make `harness-lint` reject the ways a task can currently claim `done` without the records the Definition of Done requires, and give the `team` profile the enforcement that today exists only in prose. |
 | [T-005](docs/tasks/T-005-harness-init.md) | `done` | Replace the five manual copy steps in `README.md` with one command that installs the harness into a target repository and leaves it lint-clean. |
 | [T-011](docs/tasks/T-011-project-inception.md) | `done` | Give the harness a project-level inception phase that produces decisions instead of prose, enforced by the linter, so a new project cannot start work on an architecture nobody chose and an adopted one records what it already does. |
+| [T-012](docs/tasks/T-012-record-own-foundation.md) | `done` | Write the decisions this codebase already embodies, one per applicable foundation topic, each citing the path that proves it, and declare them in harness.json so the harness stops shipping a gate it does not run on itself. |
 
 ## Next
 
@@ -34,10 +35,10 @@ Harness `0.4.0` · profile `solo`
 
 ## Journal — last 5
 
+- 2026-08-27 | T-012 | done | recorded this repo own foundation; the harness now runs its own inception gate | 7 files | tests 64/64, lint clean | D-021 D-022 D-023 D-024 D-025
 - 2026-08-27 | T-011 | done | inception gate: foundation decisions before task one, greenfield and brownfield | 14 files | tests 64/64, lint clean | D-020
 - 2026-08-27 | T-005 | done | harness-init installs the harness in one command | 4 files | tests 55/55, check clean | D-014
 - 2026-08-27 | T-004 | done | linter enforces closure integrity and the team profile | 8 files | tests 55/55, check clean | D-013
 - 2026-08-27 | T-003 | done | templates/ split from this repo's specs, CLAUDE.md shipped | 21 files | tests 55/55, check clean | D-012
-- 2026-08-26 | T-002 | done | canonical path resolution in scripts, 0.2.1 | 11 files | tests 39/39, check clean | D-011
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

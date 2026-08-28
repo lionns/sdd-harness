@@ -27,3 +27,8 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-018](D-018-testable-criteria-grammar.md) | 2026-08-27 | A grammar for behavioral criteria, and no linter for it | `proposed` | none |
 | [D-019](D-019-forward-traceability-only.md) | 2026-08-27 | Forward traceability is linted; reverse traceability is not | `proposed` | none |
 | [D-020](D-020-foundation-before-task-one.md) | 2026-08-27 | The foundation is settled before task one, as decisions | `accepted` | none |
+| [D-021](D-021-runtime.md) | 2026-08-27 | Node built-ins only, ESM, no runtime dependencies | `accepted` | none |
+| [D-022](D-022-data.md) | 2026-08-27 | The records are the data; git is the store | `accepted` | none |
+| [D-023](D-023-boundaries.md) | 2026-08-27 | One reader of records; documents never depend on scripts | `accepted` | none |
+| [D-024](D-024-deploy.md) | 2026-08-27 | Distribution is by copy, not by package | `accepted` | none |
+| [D-025](D-025-tests.md) | 2026-08-27 | A check is `npm run check`: tests, regenerate, lint, in that order | `accepted` | none |
