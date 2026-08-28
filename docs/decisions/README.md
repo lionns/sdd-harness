@@ -34,3 +34,4 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-025](D-025-tests.md) | 2026-08-27 | A check is `npm run check`: tests, regenerate, lint, in that order | `accepted` | none |
 | [D-026](D-026-sdd-budget-650.md) | 2026-08-27 | The `docs/sdd/` budget rises to 650, after the duplication is spent | `accepted` | none |
 | [D-027](D-027-vendor-neutral-enforcement.md) | 2026-08-27 | Enforcement is a git hook; vendor layers are accelerators | `accepted` | none |
+| [D-028](D-028-readme-is-for-adopters.md) | 2026-08-27 | The README is for adopters; contributors read AGENTS.md | `accepted` | none |

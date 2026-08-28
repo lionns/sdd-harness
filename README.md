@@ -1,86 +1,143 @@
 # SDD Harness
 
-A reusable Specification-Driven Development workflow for agent-assisted delivery. Project-agnostic:
-product and architecture details live in each project's `docs/project/`.
+Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Current version: **0.3.0** — see [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
+Version **0.7.0** — changelog in [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
-## What it is
+## The problem it solves
 
-Six documents, three scripts, and a manifest. Together they answer four questions without ceremony:
-what is the task, what did we decide, what state is everything in, and did the checks pass.
+Start a project with an agent and it will invent an architecture, skip the tests, and forget by next
+session what it decided. Ask it again a week later and it re-derives everything from scratch, badly
+and differently. The usual fix is to write more documents, which costs tokens every session and
+still depends on the agent reading them.
 
-```
-harness.json          active version, profile, and record budgets
-STATUS.md             generated — the whole project state, one file
-JOURNAL.md            append-only, one line per closed task
-docs/sdd/             the harness itself: README, HARNESS, ROLES, PROTOCOLS, TEMPLATES, VERSION
-docs/project/         this project's own specifications; adopters get `templates/project/`
-docs/tasks/           one file per task, state in the front-matter
-docs/decisions/       one file per decision, generated index
-docs/traces/          team profile only; in solo the trace is inline in the task
-templates/            what an adopter receives: AGENTS.md + CLAUDE.md pointer, harness.json, JOURNAL.md, specs, seed task
-scripts/              harness-status.mjs (generate) · harness-lint.mjs (enforce) · harness-init.mjs (install)
-```
+This harness takes the opposite route: **the fewest records that answer the four questions that
+matter — what is the task, what did we decide, what state is everything in, did the checks pass —
+and an executable check that enforces them, so compliance costs nothing per session.**
 
-## Profiles
+Rules that can be a check are a check. Prose is the fallback, not the mechanism.
 
-`harness.json` sets `profile`. `solo` is three roles, an inline trace, and implicit validation.
-`team` is seven roles, trace files, and an explicit validation gate. Both keep the baseline and
-final check gates. Full table in [`docs/sdd/README.md`](docs/sdd/README.md).
-
-## Using it in a project
+## Install
 
 ```sh
-node scripts/harness-init.mjs ../my-app --project=my-app --profile=solo
+node scripts/harness-init.mjs ../my-app --project=my-app --hooks
 ```
 
-That installs `docs/sdd/`, the specification templates as `docs/project/`, the two enforcement
-scripts, `harness.json`, `JOURNAL.md`, and an `AGENTS.md` that points the agent at `STATUS.md` first (with `CLAUDE.md` a pointer to it) —
-then generates `STATUS.md`, so the result is lint-clean on arrival. Existing files are never
-overwritten without `--force`.
+| Flag | Effect |
+|---|---|
+| `--project=<name>` | required |
+| `--profile=solo\|team` | `solo` is three roles, an inline trace, implicit validation. `team` is seven roles, trace files, an explicit validation gate. Default `solo` |
+| `--hooks` | installs `.githooks/pre-push`, which refuses a push whose records are invalid. Git runs it for every agent, and for a human using none |
+| `--claude` | adds a Claude Code `Stop` hook and three skills, catching a bad record a turn earlier. Optional, holds no rules |
+| `--adopt` | the repository already has code — see below |
+| `--force` | overwrite; nothing is overwritten without it |
 
-Add `--hooks` for the enforcement gate: `.githooks/pre-push` runs `harness-lint` and refuses a push
-whose records are invalid. It is vendor-neutral by construction — git runs it for every agent, and
-for a human using none (D-027). `harness-init` wires `core.hooksPath` when the target is already a
-git repository; otherwise it prints the one command to run. That setting is per clone, so CI running
-`node scripts/harness-lint.mjs` is the backstop for anyone who never ran it.
+You get `docs/sdd/`, blank specification templates in `docs/project/`, the two enforcement scripts,
+`harness.json`, `JOURNAL.md`, and an `AGENTS.md` telling the agent to read `STATUS.md` first. The
+result is lint-clean on arrival.
 
-Add `--claude` on top for Claude Code specifically: a `Stop` hook that runs the same linter when a
-turn ends, plus three skills. It catches a broken record earlier than the push. Every other agent
-loses that window and nothing else — no vendor layer holds a rule, and a test keeps it that way.
+`--hooks` sets `core.hooksPath` when the target is already a git repo, otherwise it prints the one
+command. That setting is per clone, so run `node scripts/harness-lint.mjs` in CI as the backstop.
 
-Add `--adopt` for a repository that already has code. A greenfield install declares the seven
-foundation topics and no task may leave `ready` until each has an accepted decision; an adopted
-install declares none — an existing repo would go red on arrival — and ships `T-001`, the task that
-records what the code already decides and then declares them (D-020).
+## First: settle the foundation
 
-Two things remain yours:
+This is the part that stops an agent inventing your architecture.
 
-1. Settle the foundation: `runtime`, `data`, `boundaries`, `identity`, `deploy`, `tests`,
-   `interface`. One accepted decision each, ~200 lines once, and everything else is decided per
-   task on evidence. Drop a topic the project does not have.
-2. Fill `docs/project/brief.md` and `docs/project/quality-gates.md` from the `tests` decision, and
-   add `node scripts/harness-lint.mjs` to that final check gate.
+Before any task can leave `ready`, each topic your `harness.json` lists needs **one accepted
+decision** in `docs/decisions/` carrying `- Foundation: <topic>`. The defaults are the choices that
+are expensive to reverse:
 
-`templates/` is what gets installed. It never contains this repo's own specifications (D-012).
+`runtime` · `data` · `boundaries` · `identity` · `deploy` · `tests` · `interface`
+
+- **Delete** a topic your project does not have. A CLI has no `interface`; drop it rather than
+  writing "not applicable".
+- **Deferring is allowed** — as an accepted decision *to defer*, with a `- Trigger:` line naming
+  what will force the choice. A deferral is a record; silence is not.
+- **Nothing else** is decided up front. Everything beyond the list is decided per task, on evidence.
+  That is what keeps this from becoming a specification phase.
+
+Seven decisions of forty lines each is about two hundred lines, once, for the whole project.
+
+`--adopt` inverts this for an existing codebase: it declares no topics, so your in-flight work does
+not go red on arrival, and ships `T-001` — the task that records what your code already decides,
+citing the file that proves each, then declares them.
+
+The `tests` decision matters most: it is what makes the baseline gate mean something instead of
+passing trivially because nothing is configured yet.
+
+## The loop
+
+Once the foundation exists, every task runs the same way.
+
+1. **Read** `STATUS.md`, `harness.json`, and the task file. That is the whole context for most work.
+2. **Baseline gate.** Run the checks in `docs/project/quality-gates.md`. Red means the task is
+   `blocked`, not started — unless the task is to fix the baseline.
+3. **Implement** only what the task scopes.
+4. **Final gate.** Same checks, green, plus a check specific to this change and at least one that
+   exercises it against what already exists.
+5. **Close.** Fill `## Outcome`, record the trace, set `status: done`, append one line to
+   `JOURNAL.md`, run `node scripts/harness-status.mjs`.
+
+A task is a file with its state in the front-matter and nowhere else:
+
+```md
+---
+id: T-004
+title: Reject a done task with no journal line
+status: done
+profile: solo
+harness: 0.7.0
+goal: Make the Definition of Done checkable rather than described.
+decisions: [D-013]
+implements: [FR-3]
+---
+```
+
+`STATUS.md` and `docs/decisions/README.md` are generated from those files. Never edit them by hand;
+`harness-lint` regenerates them and fails if what is on disk differs.
+
+## What the linter enforces
+
+`node scripts/harness-lint.mjs` exits non-zero on any of it, and reports every violation in one run:
+
+- **Budgets** — task, trace, decision, journal, and total harness-doc lines. The numbers live in
+  `harness.json`. Hitting one means split the task; raising one is a governance change.
+- **Closure** — a `done` task needs its journal line, no unchecked acceptance criterion, a
+  `## Sources` that is not empty, a task-specific check named in `## Verification`, and a `harness:`
+  version the changelog declares.
+- **Foundation** — no task past `ready` while a declared topic has no accepted decision.
+- **Traceability** — an `implements:` id that no `docs/project/*.json` declares. Ids no task
+  implements are reported without failing: a backlog is not a defect.
+- **Staleness** — generated files that no longer match their sources.
 
 ## Commands
 
 ```sh
-npm test                          # the harness's own suite; no dependencies, Node >= 24
-npm run init -- <dir> --project=x # install into another repo (--adopt if it has code, --hooks for the gate)
+npm run check                     # tests, regenerate, lint — in that order
 node scripts/harness-status.mjs   # regenerate STATUS.md and the decision index
-node scripts/harness-lint.mjs     # enforce budgets and record shape; exit 1 on violation
-npm run check                     # all three, in order
+node scripts/harness-lint.mjs     # enforce; exit 1 on any violation
+npm run init -- <dir> --project=x # install into another repository
+npm test                          # this repo's own suite
 ```
 
-`harness-status` is deterministic — running it twice produces no diff. Never hand-edit what it writes.
+## Where things live
 
-## Budgets
+```
+harness.json          version, profile, foundation topics, record budgets
+AGENTS.md             what the agent reads first; CLAUDE.md is a pointer to it
+STATUS.md             generated — every task, decision, and recent closure, one file
+JOURNAL.md            append-only, one line per closed task
+docs/sdd/             the harness: README (routing), HARNESS, ROLES, PROTOCOLS, TEMPLATES, VERSION
+docs/project/         your specifications — brief, requirements, architecture, quality gates
+docs/tasks/           one file per task
+docs/decisions/       one file per decision, immutable once accepted, generated index
+docs/traces/          team profile only; in solo the trace is inline in the task
+```
 
-Task 120 lines · trace block 25 · decision 40 · journal entry 1 · `docs/sdd/` total 600.
-Enforced, not suggested (D-009). The linter also enforces closure: a `done` task needs its journal
-line, no unchecked acceptance criterion, and a `harness:` version the changelog declares (D-013).
+[`docs/sdd/README.md`](docs/sdd/README.md) is the routing index: it says which harness document to
+open for which job, and asks you not to read the rest.
 
-Hitting a budget means split the task, not raise the limit. Raising one is a governance change.
+---
+
+This repository is the harness, and runs under it. If you are changing the harness rather than using
+it, start at [`AGENTS.md`](AGENTS.md) — the governance rules bind every change here.
