@@ -184,7 +184,12 @@ test("--claude installs the Stop gate and the skills; without it nothing changes
 
   const settings = JSON.parse(readFileSync(join(dir, ".claude/settings.json"), "utf8"));
   assert.equal(settings.hooks.Stop.length, 1);
-  assert.match(settings.hooks.Stop[0].command, /harness-gate\.mjs/);
+  const group = settings.hooks.Stop[0];
+  assert.equal("matcher" in group, false, "Stop has no tool to match (T-008)");
+  assert.ok(Array.isArray(group.hooks), "a Stop handler is a matcher group holding a hooks array, not a bare command");
+  assert.equal(group.hooks.length, 1);
+  assert.equal(group.hooks[0].type, "command");
+  assert.match(group.hooks[0].command, /harness-gate\.mjs/);
   assert.equal(inside(dir, "harness-lint.mjs").code, 0, "a hooked install must still lint clean");
 });
 

@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.7.0` · Status: `Operational` · Date: 2026-08-27
+Version: `0.7.1` · Status: `Operational` · Date: 2026-08-28
 
 The active version and profile for a project live in its `harness.json`. This file is the changelog
 and the versioning rules.
@@ -9,7 +9,7 @@ and the versioning rules.
 
 - `MAJOR` — incompatible governance, workflow, role, or protocol changes.
 - `MINOR` — backward-compatible additions to protocols, templates, roles, gates, or records.
-- `PATCH` — clarifications, formatting, non-behavioral documentation changes.
+- `PATCH` — clarifications, formatting, and fixes that restore already-documented behavior.
 
 ## Change Rules
 
@@ -20,6 +20,18 @@ and the versioning rules.
 - A project may stay on an older version. `0.1.0` remains valid for projects that have not migrated.
 
 ## Changelog
+
+### 0.7.1 — 2026-08-28
+
+The `Stop` gate 0.5.0 announced had never run. D-029.
+
+- **Malformed hook shape.** `.claude/settings.json` placed the command directly in the `Stop` array
+  instead of inside a matcher group, which Claude Code discards without erroring. Any repo that ran
+  `harness-init --claude` between 0.5.0 and 0.7.0 holds a gate that never fired: re-run it with
+  `--force`, or wrap the command in `{"hooks": [ ... ]}` by hand. `--hooks` and
+  `.githooks/pre-push` (D-027) were never affected, so records stayed enforced at push.
+- **`PATCH` widened** to admit fixes that restore already-documented behavior (D-029). The old
+  wording covered only non-behavioral edits, which left a restored gate with no version to ship in.
 
 ### 0.7.0 — 2026-08-27
 
