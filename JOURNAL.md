@@ -18,3 +18,5 @@
 2026-08-27 | T-006 | done | checks are protected, composition required, task-specific verification linted | 6 files | tests 81/81, lint clean | D-015 D-026
 2026-08-27 | T-013 | done | enforcement moved to a git pre-push hook; any agent, or none | 12 files | tests 85/85, lint clean | D-027
 2026-08-27 | T-014 | done | README rewritten for adopters; its facts pinned by tests | 2 files | tests 89/89, lint clean | D-028
+2026-08-28 | T-015 | done | Stop hook rewritten to the two-level schema; the gate was never firing | 3 files | tests 89/89, lint clean | —
+2026-08-28 | T-016 | done | 0.7.1: the dead Stop gate recorded, PATCH widened, adopters told | 6 files | tests 89/89, lint clean | D-029

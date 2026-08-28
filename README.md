@@ -2,7 +2,7 @@
 
 Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Version **0.7.0** — changelog in [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
+Version **0.7.1** — changelog in [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
 ## The problem it solves
 

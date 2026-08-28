@@ -2,10 +2,14 @@
   "hooks": {
     "Stop": [
       {
-        "type": "command",
-        "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/harness-gate.mjs\"",
-        "timeout": 30,
-        "statusMessage": "Checking harness records"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/harness-gate.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking harness records"
+          }
+        ]
       }
     ]
   }
