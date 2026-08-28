@@ -168,3 +168,30 @@ test("the greenfield gate actually fires: a task moved to doing is refused until
   const cleared = inside(dir, "harness-lint.mjs");
   assert.equal(cleared.code, 0, `the gate must clear once the foundation exists\n${cleared.stderr}`);
 });
+
+test("--hooks installs the Stop gate and the skills; without it nothing changes", () => {
+  const plain = target();
+  init(plain, "--project=my-app");
+  assert.equal(existsSync(join(plain, ".claude")), false, "the default install must stay byte-identical to 0.4.0");
+
+  const dir = target();
+  assert.equal(init(dir, "--project=my-app", "--hooks").code, 0);
+  for (const path of [".claude/settings.json", ".claude/hooks/harness-gate.mjs",
+    ".claude/skills/close-task/SKILL.md", ".claude/skills/plan-task/SKILL.md",
+    ".claude/skills/propose-governance-change/SKILL.md"]) {
+    assert.equal(existsSync(join(dir, path)), true, `missing ${path}`);
+  }
+
+  const settings = JSON.parse(readFileSync(join(dir, ".claude/settings.json"), "utf8"));
+  assert.equal(settings.hooks.Stop.length, 1);
+  assert.match(settings.hooks.Stop[0].command, /harness-gate\.mjs/);
+  assert.equal(inside(dir, "harness-lint.mjs").code, 0, "a hooked install must still lint clean");
+});
+
+test("--hooks refuses to clobber an existing .claude/", () => {
+  const dir = target();
+  init(dir, "--project=my-app", "--hooks");
+  const refused = init(dir, "--project=my-app", "--hooks");
+  assert.equal(refused.code, 1);
+  assert.match(refused.stderr, /\.claude/, "an adopter's own hooks must never be silently overwritten");
+});

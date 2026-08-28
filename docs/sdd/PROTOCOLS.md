@@ -2,15 +2,8 @@
 
 ## Budgets
 
-These are enforced by `scripts/harness-lint.mjs`, not suggested. Limits live in `harness.json`.
-
-| Record | Limit |
-|---|---|
-| Task file | 120 lines |
-| Trace block | 25 lines |
-| Decision file | 40 lines |
-| Journal entry | 1 line |
-| `docs/sdd/` total | 600 lines |
+Enforced by `scripts/harness-lint.mjs`, not suggested. The limits themselves live in `harness.json`
+under `budgets` — read them there, not from a copy here that can drift.
 
 Exceeding a budget means the record is doing something it should not: pasting content that already
 exists elsewhere, accumulating history that belongs in `git log`, or bundling several tasks into

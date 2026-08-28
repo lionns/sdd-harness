@@ -2,7 +2,7 @@
 
 # Status — sdd-harness
 
-Harness `0.4.0` · profile `solo`
+Harness `0.5.0` · profile `solo`
 
 ## Tasks
 
@@ -10,7 +10,6 @@ Harness `0.4.0` · profile `solo`
 |---|---|---|
 | [T-006](docs/tasks/T-006-verification-that-survives.md) | `ready` | Close the gap between "the configured checks pass" and "the change works", by forbidding the cheap ways to make a gate green and by requiring one criterion about composition rather than isolation. |
 | [T-007](docs/tasks/T-007-agents-md-entry-point.md) | `ready` | Ship `AGENTS.md` as the single agent entry point, with `CLAUDE.md` reduced to a one-line pointer, so the harness works with any agent family at no extra context cost. |
-| [T-008](docs/tasks/T-008-enforcement-without-the-agent.md) | `ready` | Package the harness as an optional Claude Code plugin whose hooks run the enforcement scripts automatically, so compliance stops costing context on every session and stops depending on the agent remembering. |
 | [T-009](docs/tasks/T-009-testable-criteria.md) | `ready` | Adopt a constrained grammar for behavioral acceptance criteria so a criterion states a trigger and an observable result, removing the ambiguity an agent would otherwise resolve by guessing. |
 | [T-010](docs/tasks/T-010-orphan-and-drift-check.md) | `ready` | Make the linter report requirements that no task implements and tasks that cite no source, so the gap between the specification and the work is visible at zero cost per session. |
 | [T-001](docs/tasks/T-001-harness-self-baseline.md) | `done` | Give this repo the green baseline it demands of every project it is copied into — real quality gates and an automated test suite for the two scripts that enforce the harness. |
@@ -18,6 +17,7 @@ Harness `0.4.0` · profile `solo`
 | [T-003](docs/tasks/T-003-adoption-templates.md) | `done` | Give adopters a pristine `templates/` tree to copy — including the `CLAUDE.md` entry point the harness needs to take effect — and let `docs/project/` hold this repo's real specifications instead of a mix of both. |
 | [T-004](docs/tasks/T-004-closure-integrity.md) | `done` | Make `harness-lint` reject the ways a task can currently claim `done` without the records the Definition of Done requires, and give the `team` profile the enforcement that today exists only in prose. |
 | [T-005](docs/tasks/T-005-harness-init.md) | `done` | Replace the five manual copy steps in `README.md` with one command that installs the harness into a target repository and leaves it lint-clean. |
+| [T-008](docs/tasks/T-008-enforcement-without-the-agent.md) | `done` | Run the enforcement scripts from a Stop hook installed into the adopting repo, so compliance stops costing context on every session and stops depending on the agent remembering. |
 | [T-011](docs/tasks/T-011-project-inception.md) | `done` | Give the harness a project-level inception phase that produces decisions instead of prose, enforced by the linter, so a new project cannot start work on an architecture nobody chose and an adopted one records what it already does. |
 | [T-012](docs/tasks/T-012-record-own-foundation.md) | `done` | Write the decisions this codebase already embodies, one per applicable foundation topic, each citing the path that proves it, and declare them in harness.json so the harness stops shipping a gate it does not run on itself. |
 
@@ -29,16 +29,15 @@ Harness `0.4.0` · profile `solo`
 
 - D-015 — The checks are part of the contract, not a dial — `proposed`, needs human approval
 - D-016 — `AGENTS.md` is the entry point; `CLAUDE.md` is a pointer — `proposed`, needs human approval
-- D-017 — Enforcement belongs in hooks, not in the agent's memory — `proposed`, needs human approval
 - D-018 — A grammar for behavioral criteria, and no linter for it — `proposed`, needs human approval
 - D-019 — Forward traceability is linted; reverse traceability is not — `proposed`, needs human approval
 
 ## Journal — last 5
 
+- 2026-08-27 | T-008 | done | Stop-hook gate and three skills; enforcement now runs without the agent | 16 files | tests 73/73, lint clean | D-017
 - 2026-08-27 | T-012 | done | recorded this repo own foundation; the harness now runs its own inception gate | 7 files | tests 64/64, lint clean | D-021 D-022 D-023 D-024 D-025
 - 2026-08-27 | T-011 | done | inception gate: foundation decisions before task one, greenfield and brownfield | 14 files | tests 64/64, lint clean | D-020
 - 2026-08-27 | T-005 | done | harness-init installs the harness in one command | 4 files | tests 55/55, check clean | D-014
 - 2026-08-27 | T-004 | done | linter enforces closure integrity and the team profile | 8 files | tests 55/55, check clean | D-013
-- 2026-08-27 | T-003 | done | templates/ split from this repo's specs, CLAUDE.md shipped | 21 files | tests 55/55, check clean | D-012
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

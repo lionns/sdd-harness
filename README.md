@@ -40,6 +40,11 @@ scripts, `harness.json`, `JOURNAL.md`, and a `CLAUDE.md` that points the agent a
 then generates `STATUS.md`, so the result is lint-clean on arrival. Existing files are never
 overwritten without `--force`.
 
+Add `--hooks` to install a `Stop` gate: `harness-lint` runs when the agent finishes a turn, and a
+broken record blocks the turn and is handed back to the session — enforcement that costs no context
+and does not depend on the agent remembering (D-017). It is standalone `.claude/`, checked into the
+repo, so teammates get it with no install step.
+
 Add `--adopt` for a repository that already has code. A greenfield install declares the seven
 foundation topics and no task may leave `ready` until each has an accepted decision; an adopted
 install declares none — an existing repo would go red on arrival — and ships `T-001`, the task that
@@ -59,7 +64,7 @@ Two things remain yours:
 
 ```sh
 npm test                          # the harness's own suite; no dependencies, Node >= 24
-npm run init -- <dir> --project=x # install the harness into another repository (--adopt if it has code)
+npm run init -- <dir> --project=x # install into another repo (--adopt if it has code, --hooks for the gate)
 node scripts/harness-status.mjs   # regenerate STATUS.md and the decision index
 node scripts/harness-lint.mjs     # enforce budgets and record shape; exit 1 on violation
 npm run check                     # all three, in order

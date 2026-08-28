@@ -51,12 +51,15 @@ export function plan({ project, profile, adopt = false, root = ROOT }) {
   return files;
 }
 
-function install({ target, project, profile, adopt = false, force = false }) {
+function install({ target, project, profile, adopt = false, hooks = false, force = false }) {
   const files = plan({ project, profile, adopt });
   const trees = [
     ["docs/sdd", "docs/sdd"],
     ["templates/project", "docs/project"],
     ["scripts/lib", "scripts/lib"],
+    // Standalone `.claude/`, not a plugin: it is checked into the adopting repo, so every teammate
+    // gets the gate with no install step — the same reason distribution is by copy (D-017, D-024).
+    ...(hooks ? [["templates/claude", ".claude"]] : []),
   ];
 
   const collisions = force ? [] : [
@@ -91,7 +94,7 @@ function install({ target, project, profile, adopt = false, force = false }) {
 
 const args = parseArgs(process.argv.slice(2));
 if (!args.target || !args.project) {
-  console.error("usage: harness-init <target> --project=<name> [--profile=solo|team] [--adopt] [--force]");
+  console.error("usage: harness-init <target> --project=<name> [--profile=solo|team] [--adopt] [--hooks] [--force]");
   process.exit(1);
 }
 const profile = args.profile === true || args.profile === undefined ? "solo" : args.profile;
@@ -104,8 +107,8 @@ const target = resolve(args.target);
 mkdirSync(target, { recursive: true });
 try {
   const adopt = Boolean(args.adopt);
-  const written = install({ target, project: args.project, profile, adopt, force: Boolean(args.force) });
-  console.log(`harness-init: installed ${config().harness} (${profile}${adopt ? ", adopt" : ""}) into ${target}`);
+  const written = install({ target, project: args.project, profile, adopt, hooks: Boolean(args.hooks), force: Boolean(args.force) });
+  console.log(`harness-init: installed ${config().harness} (${[profile, adopt && "adopt", args.hooks && "hooks"].filter(Boolean).join(", ")}) into ${target}`);
   for (const path of written) console.log(`  ${path}`);
   console.log(adopt
     ? "\nNext: work T-001. Record what this codebase already decides, one accepted decision per topic, then declare them in harness.json."

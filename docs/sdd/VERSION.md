@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.4.0` · Status: `Operational` · Date: 2026-08-27
+Version: `0.5.0` · Status: `Operational` · Date: 2026-08-27
 
 The active version and profile for a project live in its `harness.json`. This file is the changelog
 and the versioning rules.
@@ -20,6 +20,17 @@ and the versioning rules.
 - A project may stay on an older version. `0.1.0` remains valid for projects that have not migrated.
 
 ## Changelog
+
+### 0.5.0 — 2026-08-27
+
+Moves enforcement off the agent's memory and into a hook. D-017.
+
+- **Stop gate.** `harness-init --hooks` installs `.claude/settings.json`, a `Stop` hook running
+  `harness-lint`, and three skills. A failing check blocks the turn and hands the report back, so a
+  broken record is caught without the agent having read any rule that session.
+- **Standalone, not a plugin.** Checked into the adopting repo, so it needs no install and reaches
+  every teammate (D-024). The `hooks` object is format-identical to a plugin's, so converting later
+  is a copy. Without `--hooks` the install is byte-identical to 0.4.0.
 
 ### 0.4.0 — 2026-08-27
 

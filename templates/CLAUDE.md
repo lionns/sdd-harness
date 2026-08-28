@@ -38,3 +38,5 @@ in `docs/decisions/`, and a `VERSION.md` entry when behavior changes. Propose; d
 node scripts/harness-status.mjs   # regenerate STATUS.md and the decision index
 node scripts/harness-lint.mjs     # enforce budgets, record shape, and closure integrity
 ```
+
+If `.claude/hooks/harness-gate.mjs` exists, that linter also runs automatically when a turn ends.

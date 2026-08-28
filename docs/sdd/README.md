@@ -12,23 +12,14 @@ If those three answer the question, stop reading.
 
 ## Profiles
 
-`harness.json` declares the active profile. The profile decides roles, required records, and gates.
-
-| | `solo` | `team` |
-|---|---|---|
-| Roles | Planner · Implementer · Reviewer | all seven in `AGENTS.md` |
-| Trace | bounded block inside the task file | separate file in `docs/traces/` |
-| Human validation | implicit on accepting the change | explicit gate |
-| Required records | task file + journal line | task + trace + journal + validation record |
-| Baseline & final check gates | required | required |
-
-Normative definitions are in `HARNESS.md`.
+`harness.json` declares the active profile: `solo` or `team`. It decides roles, required records,
+and gates. The comparison and the normative definitions are in `HARNESS.md` § Profiles.
 
 ## The Five Documents
 
 | Document | Read it when |
 |---|---|
-| `HARNESS.md` | Executing any task: principles, flow, profiles, DoR, DoD, gates |
+| `HARNESS.md` | Executing any task: principles, inception, flow, profiles, DoR, DoD, gates |
 | `AGENTS.md` | You need role boundaries, universal agent rules, or escalation |
 | `PROTOCOLS.md` | Selecting context, writing a trace, or reviewing a change |
 | `TEMPLATES.md` | Creating a task, a decision, a journal line, or a trace block |

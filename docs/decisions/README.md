@@ -23,7 +23,7 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-014](D-014-bootstrap-script.md) | 2026-08-27 | Adoption is one command, not five manual steps | `accepted` | none |
 | [D-015](D-015-verification-that-survives.md) | 2026-08-27 | The checks are part of the contract, not a dial | `proposed` | none |
 | [D-016](D-016-agents-md-entry-point.md) | 2026-08-27 | `AGENTS.md` is the entry point; `CLAUDE.md` is a pointer | `proposed` | none |
-| [D-017](D-017-enforcement-off-the-agent.md) | 2026-08-27 | Enforcement belongs in hooks, not in the agent's memory | `proposed` | none |
+| [D-017](D-017-enforcement-off-the-agent.md) | 2026-08-27 | Enforcement belongs in hooks, not in the agent's memory | `accepted` | none |
 | [D-018](D-018-testable-criteria-grammar.md) | 2026-08-27 | A grammar for behavioral criteria, and no linter for it | `proposed` | none |
 | [D-019](D-019-forward-traceability-only.md) | 2026-08-27 | Forward traceability is linted; reverse traceability is not | `proposed` | none |
 | [D-020](D-020-foundation-before-task-one.md) | 2026-08-27 | The foundation is settled before task one, as decisions | `accepted` | none |
