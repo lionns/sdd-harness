@@ -72,14 +72,16 @@ test("each skill body stays inside its budget and adds no rule of its own", () =
   }
 });
 
-test("this repo's .claude/ is the template, byte for byte", () => {
+test("this repo's vendor and neutral layers are the templates, byte for byte", () => {
   const walk = (dir, base = dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
     e.isDirectory() ? walk(join(dir, e.name), base) : [relative(base, join(dir, e.name))]);
 
-  const source = join(ROOT, "templates/claude");
-  const installed = join(ROOT, ".claude");
-  assert.deepEqual(walk(installed).sort(), walk(source).sort(), "the dogfooded copy must not drift");
-  for (const file of walk(source)) {
-    assert.equal(readFileSync(join(installed, file), "utf8"), readFileSync(join(source, file), "utf8"), file);
+  for (const [from, to] of [["templates/claude", ".claude"], ["templates/githooks", ".githooks"]]) {
+    const source = join(ROOT, from);
+    const installed = join(ROOT, to);
+    assert.deepEqual(walk(installed).sort(), walk(source).sort(), `${to} drifted from ${from}`);
+    for (const file of walk(source)) {
+      assert.equal(readFileSync(join(installed, file), "utf8"), readFileSync(join(source, file), "utf8"), `${to}/${file}`);
+    }
   }
 });

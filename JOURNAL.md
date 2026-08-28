@@ -16,3 +16,4 @@
 2026-08-27 | T-009 | done | acceptance criteria grammar, documented and deliberately not linted | 2 files | tests 81/81, lint clean | D-018
 2026-08-27 | T-010 | done | forward traceability: implements linted, sources required, orphans reported | 5 files | tests 81/81, lint clean | D-019
 2026-08-27 | T-006 | done | checks are protected, composition required, task-specific verification linted | 6 files | tests 81/81, lint clean | D-015 D-026
+2026-08-27 | T-013 | done | enforcement moved to a git pre-push hook; any agent, or none | 12 files | tests 85/85, lint clean | D-027

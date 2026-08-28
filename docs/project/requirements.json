@@ -65,11 +65,18 @@
     },
     {
       "id": "NFR-4",
-      "statement": "docs/sdd/ stays within 600 lines in total; consolidation beats addition."
+      "statement": "docs/sdd/ stays within the budget harness.json declares; consolidation beats addition."
     },
     {
       "id": "NFR-5",
       "statement": "The linter reports every violation in one run, never only the first."
+    },
+    {
+      "id": "NFR-6",
+      "statement": "The harness works with any coding agent, and with none. No rule, gate, or record depends on one vendor's tooling; vendor layers are optional accelerators that hold no rules.",
+      "sources": [
+        "D-027"
+      ]
     }
   ]
 }

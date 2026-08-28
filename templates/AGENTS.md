@@ -39,4 +39,5 @@ node scripts/harness-status.mjs   # regenerate STATUS.md and the decision index
 node scripts/harness-lint.mjs     # enforce budgets, record shape, and closure integrity
 ```
 
-If `.claude/hooks/harness-gate.mjs` exists, that linter also runs automatically when a turn ends.
+`.githooks/pre-push` runs that linter before any push, for whichever agent is in the room. If
+`.claude/` is also installed, it runs when a turn ends too. Neither holds a rule of its own.

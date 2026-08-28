@@ -8,7 +8,7 @@
  * generates STATUS.md so the result is lint-clean on arrival. Never overwrites without --force, and
  * never copies itself: this script is useless inside an installed project.
  */
-import { cpSync, mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
+import { cpSync, mkdirSync, writeFileSync, readFileSync, existsSync, chmodSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import { ROOT, config, FOUNDATION_TOPICS } from "./lib/harness.mjs";
@@ -52,15 +52,17 @@ export function plan({ project, profile, adopt = false, root = ROOT }) {
   return files;
 }
 
-function install({ target, project, profile, adopt = false, hooks = false, force = false }) {
+function install({ target, project, profile, adopt = false, hooks = false, claude = false, force = false }) {
   const files = plan({ project, profile, adopt });
   const trees = [
     ["docs/sdd", "docs/sdd"],
     ["templates/project", "docs/project"],
     ["scripts/lib", "scripts/lib"],
-    // Standalone `.claude/`, not a plugin: it is checked into the adopting repo, so every teammate
-    // gets the gate with no install step — the same reason distribution is by copy (D-017, D-024).
-    ...(hooks ? [["templates/claude", ".claude"]] : []),
+    // The neutral gate: git runs it for every agent, and for a human using none (D-027).
+    ...(hooks ? [["templates/githooks", ".githooks"]] : []),
+    // Standalone `.claude/`, not a plugin: checked into the adopting repo, so every teammate gets it
+    // with no install step (D-017). An accelerator on top of the git hook, never a replacement.
+    ...(claude ? [["templates/claude", ".claude"]] : []),
   ];
 
   const collisions = force ? [] : [
@@ -83,6 +85,9 @@ function install({ target, project, profile, adopt = false, hooks = false, force
   }
   for (const [path, contents] of files) writeFileSync(join(target, path), contents);
 
+  // cpSync does not reliably carry the executable bit, and git silently ignores a hook it cannot run.
+  if (hooks) chmodSync(join(target, ".githooks/pre-push"), 0o755);
+
   execFileSync(process.execPath, [join(target, "scripts/harness-status.mjs")], { stdio: "pipe" });
   return [
     ...files.map(([p]) => p),
@@ -95,7 +100,7 @@ function install({ target, project, profile, adopt = false, hooks = false, force
 
 const args = parseArgs(process.argv.slice(2));
 if (!args.target || !args.project) {
-  console.error("usage: harness-init <target> --project=<name> [--profile=solo|team] [--adopt] [--hooks] [--force]");
+  console.error("usage: harness-init <target> --project=<name> [--profile=solo|team] [--adopt] [--hooks] [--claude] [--force]");
   process.exit(1);
 }
 const profile = args.profile === true || args.profile === undefined ? "solo" : args.profile;
@@ -108,9 +113,22 @@ const target = resolve(args.target);
 mkdirSync(target, { recursive: true });
 try {
   const adopt = Boolean(args.adopt);
-  const written = install({ target, project: args.project, profile, adopt, hooks: Boolean(args.hooks), force: Boolean(args.force) });
-  console.log(`harness-init: installed ${config().harness} (${[profile, adopt && "adopt", args.hooks && "hooks"].filter(Boolean).join(", ")}) into ${target}`);
+  const hooks = Boolean(args.hooks);
+  const written = install({ target, project: args.project, profile, adopt, hooks, claude: Boolean(args.claude), force: Boolean(args.force) });
+  const flags = [profile, adopt && "adopt", hooks && "hooks", args.claude && "claude"].filter(Boolean).join(", ");
+  console.log(`harness-init: installed ${config().harness} (${flags}) into ${target}`);
   for (const path of written) console.log(`  ${path}`);
+
+  // Per clone, not per repo: git keeps `core.hooksPath` in .git/config, which is not checked in.
+  if (hooks) {
+    try {
+      execFileSync("git", ["-C", target, "rev-parse", "--git-dir"], { stdio: "pipe" });
+      execFileSync("git", ["-C", target, "config", "core.hooksPath", ".githooks"], { stdio: "pipe" });
+      console.log("\n  git config core.hooksPath .githooks   (set)");
+    } catch {
+      console.log("\n  Not a git repository yet. After `git init`, run:  git config core.hooksPath .githooks");
+    }
+  }
   console.log(adopt
     ? "\nNext: work T-001. Record what this codebase already decides, one accepted decision per topic, then declare them in harness.json."
     : `\nNext: fill docs/project/brief.md, then settle the foundation — one accepted decision per topic in ${FOUNDATION_TOPICS.join(", ")}. No task leaves \`ready\` until they exist.`);

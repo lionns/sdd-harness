@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.6.0` · Status: `Operational` · Date: 2026-08-27
+Version: `0.7.0` · Status: `Operational` · Date: 2026-08-27
 
 The active version and profile for a project live in its `harness.json`. This file is the changelog
 and the versioning rules.
@@ -20,6 +20,18 @@ and the versioning rules.
 - A project may stay on an older version. `0.1.0` remains valid for projects that have not migrated.
 
 ## Changelog
+
+### 0.7.0 — 2026-08-27
+
+The enforcement gate stops belonging to one agent. D-027.
+
+- **`.githooks/pre-push`** (D-027). `harness-init --hooks` installs it and wires `core.hooksPath`
+  when the target is a git repository. Git runs it for every agent and for a human using none, so
+  the rules are enforced regardless of what is in the room. `core.hooksPath` is per clone, which
+  makes CI the backstop rather than an extra.
+- **`--claude`** now carries the `Stop` hook and the skills, renamed from `--hooks` in 0.5.0. A
+  vendor layer is an accelerator that catches a broken record earlier; it holds no rule, and a test
+  keeps it that way. Any future vendor gets its own flag on the same terms.
 
 ### 0.6.0 — 2026-08-27
 

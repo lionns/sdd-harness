@@ -47,3 +47,6 @@ npm run status    # regenerate STATUS.md and the decision index
 npm run lint      # enforce budgets, record shape, and closure integrity
 npm run check     # all three, in order
 ```
+
+`.githooks/pre-push` runs `harness-lint` before any push — enable it once per clone with
+`git config core.hooksPath .githooks`. `.claude/` adds the same check when a turn ends.

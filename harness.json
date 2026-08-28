@@ -1,5 +1,5 @@
 {
-  "harness": "0.6.0",
+  "harness": "0.7.0",
   "profile": "solo",
   "project": "sdd-harness",
   "foundation": [

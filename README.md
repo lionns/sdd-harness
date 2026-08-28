@@ -40,10 +40,15 @@ scripts, `harness.json`, `JOURNAL.md`, and an `AGENTS.md` that points the agent 
 then generates `STATUS.md`, so the result is lint-clean on arrival. Existing files are never
 overwritten without `--force`.
 
-Add `--hooks` to install a `Stop` gate: `harness-lint` runs when the agent finishes a turn, and a
-broken record blocks the turn and is handed back to the session — enforcement that costs no context
-and does not depend on the agent remembering (D-017). It is standalone `.claude/`, checked into the
-repo, so teammates get it with no install step.
+Add `--hooks` for the enforcement gate: `.githooks/pre-push` runs `harness-lint` and refuses a push
+whose records are invalid. It is vendor-neutral by construction — git runs it for every agent, and
+for a human using none (D-027). `harness-init` wires `core.hooksPath` when the target is already a
+git repository; otherwise it prints the one command to run. That setting is per clone, so CI running
+`node scripts/harness-lint.mjs` is the backstop for anyone who never ran it.
+
+Add `--claude` on top for Claude Code specifically: a `Stop` hook that runs the same linter when a
+turn ends, plus three skills. It catches a broken record earlier than the push. Every other agent
+loses that window and nothing else — no vendor layer holds a rule, and a test keeps it that way.
 
 Add `--adopt` for a repository that already has code. A greenfield install declares the seven
 foundation topics and no task may leave `ready` until each has an accepted decision; an adopted

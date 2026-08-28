@@ -1,6 +1,6 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, existsSync, readFileSync, writeFileSync, rmSync, realpathSync } from "node:fs";
+import { mkdtempSync, mkdirSync, existsSync, readFileSync, writeFileSync, rmSync, realpathSync, statSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -169,13 +169,13 @@ test("the greenfield gate actually fires: a task moved to doing is refused until
   assert.equal(cleared.code, 0, `the gate must clear once the foundation exists\n${cleared.stderr}`);
 });
 
-test("--hooks installs the Stop gate and the skills; without it nothing changes", () => {
+test("--claude installs the Stop gate and the skills; without it nothing changes", () => {
   const plain = target();
   init(plain, "--project=my-app");
   assert.equal(existsSync(join(plain, ".claude")), false, "the default install must stay byte-identical to 0.4.0");
 
   const dir = target();
-  assert.equal(init(dir, "--project=my-app", "--hooks").code, 0);
+  assert.equal(init(dir, "--project=my-app", "--claude").code, 0);
   for (const path of [".claude/settings.json", ".claude/hooks/harness-gate.mjs",
     ".claude/skills/close-task/SKILL.md", ".claude/skills/plan-task/SKILL.md",
     ".claude/skills/propose-governance-change/SKILL.md"]) {
@@ -188,10 +188,10 @@ test("--hooks installs the Stop gate and the skills; without it nothing changes"
   assert.equal(inside(dir, "harness-lint.mjs").code, 0, "a hooked install must still lint clean");
 });
 
-test("--hooks refuses to clobber an existing .claude/", () => {
+test("--claude refuses to clobber an existing .claude/", () => {
   const dir = target();
-  init(dir, "--project=my-app", "--hooks");
-  const refused = init(dir, "--project=my-app", "--hooks");
+  init(dir, "--project=my-app", "--claude");
+  const refused = init(dir, "--project=my-app", "--claude");
   assert.equal(refused.code, 1);
   assert.match(refused.stderr, /\.claude/, "an adopter's own hooks must never be silently overwritten");
 });
@@ -211,4 +211,60 @@ test("AGENTS.md holds the rules and CLAUDE.md only points at it", () => {
     assert.match(rules, new RegExp(phrase), `AGENTS.md lost "${phrase}" in the move`);
   }
   assert.equal(inside(dir, "harness-lint.mjs").code, 0);
+});
+
+// --- Vendor-neutral enforcement (D-027) ---
+
+test("--hooks installs the git gate and no vendor file at all", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=my-app", "--hooks").code, 0);
+
+  const hook = join(dir, ".githooks/pre-push");
+  assert.equal(existsSync(hook), true);
+  assert.equal(existsSync(join(dir, ".claude")), false, "the neutral gate must not drag one vendor in");
+  assert.ok(statSync(hook).mode & 0o111, "git silently ignores a hook it cannot execute");
+});
+
+test("the two layers are independent and compose", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=my-app", "--hooks", "--claude").code, 0);
+  assert.equal(existsSync(join(dir, ".githooks/pre-push")), true);
+  assert.equal(existsSync(join(dir, ".claude/settings.json")), true);
+  assert.equal(inside(dir, "harness-lint.mjs").code, 0, "both gates installed must still lint clean");
+});
+
+test("core.hooksPath is set in a git repo, and explained when there is none", () => {
+  const plain = target();
+  const out = init(plain, "--project=my-app", "--hooks");
+  assert.match(out.stdout, /After `git init`, run:\s+git config core\.hooksPath \.githooks/);
+
+  const repo = target();
+  mkdirSync(repo, { recursive: true });
+  execFileSync("git", ["init", "-q", repo]);
+  const wired = init(repo, "--project=my-app", "--hooks");
+  assert.match(wired.stdout, /core\.hooksPath \.githooks\s+\(set\)/);
+  assert.equal(
+    execFileSync("git", ["-C", repo, "config", "core.hooksPath"], { encoding: "utf8" }).trim(),
+    ".githooks",
+  );
+});
+
+test("WHEN the records are invalid THE SYSTEM SHALL make the git hook exit non-zero", () => {
+  const dir = target();
+  init(dir, "--project=my-app", "--hooks");
+  execFileSync("git", ["init", "-q", dir]);
+
+  const fire = () => {
+    try {
+      return { code: 0, out: execFileSync(join(dir, ".githooks/pre-push"), [], { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }) };
+    } catch (error) {
+      return { code: error.status, out: `${error.stdout ?? ""}${error.stderr ?? ""}` };
+    }
+  };
+  assert.equal(fire().code, 0, "a clean repo must push freely");
+
+  writeFileSync(join(dir, "JOURNAL.md"), "# Journal\n\nnot a journal line\n");
+  const blocked = fire();
+  assert.equal(blocked.code, 1);
+  assert.match(blocked.out, /expected 7 pipe-separated fields/);
 });

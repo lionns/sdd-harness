@@ -2,7 +2,7 @@
 
 # Status — sdd-harness
 
-Harness `0.6.0` · profile `solo`
+Harness `0.7.0` · profile `solo`
 
 ## Tasks
 
@@ -20,6 +20,7 @@ Harness `0.6.0` · profile `solo`
 | [T-010](docs/tasks/T-010-orphan-and-drift-check.md) | `done` | Make the linter report requirements that no task implements and tasks that cite no source, so the gap between the specification and the work is visible at zero cost per session. |
 | [T-011](docs/tasks/T-011-project-inception.md) | `done` | Give the harness a project-level inception phase that produces decisions instead of prose, enforced by the linter, so a new project cannot start work on an architecture nobody chose and an adopted one records what it already does. |
 | [T-012](docs/tasks/T-012-record-own-foundation.md) | `done` | Write the decisions this codebase already embodies, one per applicable foundation topic, each citing the path that proves it, and declare them in harness.json so the harness stops shipping a gate it does not run on itself. |
+| [T-013](docs/tasks/T-013-vendor-neutral-enforcement.md) | `done` | Move the enforcement gate to a git hook that runs for every agent and for a human with none, and demote the Claude Code layer to an optional accelerator behind its own flag. |
 
 ## Next
 
@@ -31,10 +32,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-08-27 | T-013 | done | enforcement moved to a git pre-push hook; any agent, or none | 12 files | tests 85/85, lint clean | D-027
 - 2026-08-27 | T-006 | done | checks are protected, composition required, task-specific verification linted | 6 files | tests 81/81, lint clean | D-015 D-026
 - 2026-08-27 | T-010 | done | forward traceability: implements linted, sources required, orphans reported | 5 files | tests 81/81, lint clean | D-019
 - 2026-08-27 | T-009 | done | acceptance criteria grammar, documented and deliberately not linted | 2 files | tests 81/81, lint clean | D-018
 - 2026-08-27 | T-007 | done | AGENTS.md is the entry point, CLAUDE.md a pointer, roles renamed to ROLES.md | 11 files | tests 81/81, lint clean | D-016
-- 2026-08-27 | T-008 | done | Stop-hook gate and three skills; enforcement now runs without the agent | 16 files | tests 73/73, lint clean | D-017
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)
