@@ -20,3 +20,4 @@
 2026-08-27 | T-014 | done | README rewritten for adopters; its facts pinned by tests | 2 files | tests 89/89, lint clean | D-028
 2026-08-28 | T-015 | done | Stop hook rewritten to the two-level schema; the gate was never firing | 3 files | tests 89/89, lint clean | —
 2026-08-28 | T-016 | done | 0.7.1: the dead Stop gate recorded, PATCH widened, adopters told | 6 files | tests 89/89, lint clean | D-029
+2026-09-03 | T-017 | done | package.json pinned to the declared harness version, 0.7.1 | 5 files | tests 90/90, lint clean | -

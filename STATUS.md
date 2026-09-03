@@ -24,6 +24,7 @@ Harness `0.7.1` · profile `solo`
 | [T-014](docs/tasks/T-014-readme-for-adopters.md) | `done` | Rewrite the README so someone who has never seen the project can install the harness, settle a foundation, and run the daily loop; and pin the facts it states with a test so it cannot drift four versions again. |
 | [T-015](docs/tasks/T-015-stop-hook-schema-shape.md) | `done` | Correct `.claude/settings.json` and the shipped `templates/claude/settings.json` to Claude Code's two-level hook schema, so the Stop gate that D-017 installed is actually executed rather than silently discarded, and pin the shape with the existing install test. |
 | [T-016](docs/tasks/T-016-release-0-7-1.md) | `done` | Publish the T-015 schema fix as 0.7.1, widening the PATCH definition to admit fixes that restore documented behavior, and tell adopters who ran `--claude` before it that the gate they installed never fired. |
+| [T-017](docs/tasks/T-017-package-version-pin.md) | `done` | Correct `package.json` to the `0.7.1` the harness declares, and pin the two together with a test so the release version cannot drift out of the package manifest again. |
 
 ## Next
 
@@ -35,10 +36,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-09-03 | T-017 | done | package.json pinned to the declared harness version, 0.7.1 | 5 files | tests 90/90, lint clean | -
 - 2026-08-28 | T-016 | done | 0.7.1: the dead Stop gate recorded, PATCH widened, adopters told | 6 files | tests 89/89, lint clean | D-029
 - 2026-08-28 | T-015 | done | Stop hook rewritten to the two-level schema; the gate was never firing | 3 files | tests 89/89, lint clean | —
 - 2026-08-27 | T-014 | done | README rewritten for adopters; its facts pinned by tests | 2 files | tests 89/89, lint clean | D-028
 - 2026-08-27 | T-013 | done | enforcement moved to a git pre-push hook; any agent, or none | 12 files | tests 85/85, lint clean | D-027
-- 2026-08-27 | T-006 | done | checks are protected, composition required, task-specific verification linted | 6 files | tests 81/81, lint clean | D-015 D-026
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)
