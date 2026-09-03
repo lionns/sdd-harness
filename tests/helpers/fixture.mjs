@@ -10,10 +10,10 @@ const DEFAULT_CONFIG = {
   profile: "solo",
   project: "fixture",
   budgets: {
-    taskFileLines: 120,
+    taskPlanLines: 120,
+    taskRecordLines: 60,
     traceBlockLines: 25,
     decisionFileLines: 40,
-    journalEntryLines: 1,
     sddDocsTotalLines: 600,
   },
 };
@@ -34,7 +34,8 @@ export function makeRepo({ config = {}, tasks = {}, decisions = {}, journal, sdd
   created.push(root);
 
   cpSync(SOURCE_SCRIPTS, join(root, "scripts"), { recursive: true });
-  writeFileSync(join(root, "harness.json"), `${JSON.stringify({ ...DEFAULT_CONFIG, ...config }, null, 2)}\n`);
+  const cfg = { ...DEFAULT_CONFIG, ...config, budgets: { ...DEFAULT_CONFIG.budgets, ...config.budgets } };
+  writeFileSync(join(root, "harness.json"), `${JSON.stringify(cfg, null, 2)}\n`);
   // Closure integrity (D-013) means a `done` task needs a journal line. Deriving it keeps every test
   // breaking exactly one rule; pass `journal` explicitly to break this one on purpose.
   const lines = journal ?? Object.values(tasks)

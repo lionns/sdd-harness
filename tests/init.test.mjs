@@ -1,6 +1,6 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, existsSync, readFileSync, writeFileSync, rmSync, realpathSync, statSync } from "node:fs";
+import { mkdtempSync, mkdirSync, existsSync, readFileSync, writeFileSync, appendFileSync, rmSync, realpathSync, statSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -53,6 +53,38 @@ test("the installed manifest carries the current version, project, and profile",
     { harness: HARNESS.harness, project: "my-app", profile: "team" },
   );
   assert.deepEqual(cfg.budgets, HARNESS.budgets);
+});
+
+test("the install ships a lock over what it wrote, and the copy verifies on arrival", () => {
+  const bare = target();
+  init(bare, "--project=my-app");
+  const lock = JSON.parse(readFileSync(join(bare, "harness.lock"), "utf8"));
+  assert.equal(lock.source, HARNESS.project, "the lock must name the repository a change belongs in");
+  assert.ok(Object.keys(lock.files).some((p) => p.startsWith("docs/sdd/")));
+  assert.ok(!Object.keys(lock.files).some((p) => p.startsWith(".claude/")),
+    "an install without --claude must not be pinned to a vendor layer it never received");
+  assert.equal(inside(bare, "harness-lint.mjs").code, 0, "a fresh install verifies its own lock");
+
+  const full = target();
+  init(full, "--project=my-app", "--claude", "--hooks");
+  const both = JSON.parse(readFileSync(join(full, "harness.lock"), "utf8")).files;
+  assert.ok(Object.keys(both).some((p) => p.startsWith(".claude/")) && both[".githooks/pre-push"]);
+  assert.equal(inside(full, "harness-lint.mjs").code, 0, "the optional layers verify too");
+
+  appendFileSync(join(full, "docs/sdd/PROTOCOLS.md"), "\n- a local rule\n");
+  const drifted = inside(full, "harness-lint.mjs");
+  assert.equal(drifted.code, 1);
+  assert.match(drifted.stderr, /propose the change in sdd-harness, then reinstall/);
+});
+
+test("the changelog installs with the rules that point at it", () => {
+  const dir = target();
+  init(dir, "--project=my-app");
+  const changelog = readFileSync(join(dir, "CHANGELOG.md"), "utf8");
+  assert.match(changelog, new RegExp(`^### ${HARNESS.harness.replace(/\./g, "\\.")} `, "m"),
+    "an adopter must be able to read why its version is what it is");
+  assert.doesNotMatch(readFileSync(join(dir, "docs/sdd/VERSION.md"), "utf8"), /^### \d+\.\d+\.\d+/m,
+    "the rules document must not carry the history it points at");
 });
 
 test("the agent entry point and the specification templates arrive, unfilled", () => {

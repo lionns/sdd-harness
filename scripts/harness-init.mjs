@@ -12,9 +12,11 @@ import { cpSync, mkdirSync, writeFileSync, readFileSync, existsSync, chmodSync }
 import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import { ROOT, config, FOUNDATION_TOPICS } from "./lib/harness.mjs";
+import { manifest } from "./harness-manifest.mjs";
 
 const PROFILES = ["solo", "team"];
 const SCRIPTS = ["harness-status.mjs", "harness-lint.mjs"];
+
 
 function parseArgs(argv) {
   const flags = {};
@@ -44,6 +46,9 @@ export function plan({ project, profile, adopt = false, root = ROOT }) {
     ["AGENTS.md", readFileSync(join(root, "templates/AGENTS.md"), "utf8")],
     ["CLAUDE.md", readFileSync(join(root, "templates/CLAUDE.md"), "utf8")],
     ["JOURNAL.md", readFileSync(join(root, "templates/JOURNAL.md"), "utf8")],
+    // The changelog is how an adopter reads why its version changed, so it installs with the rules
+    // that point at it (D-032).
+    ["CHANGELOG.md", readFileSync(join(root, "CHANGELOG.md"), "utf8")],
   ];
   if (adopt) {
     const seed = readFileSync(join(root, "templates/T-001-record-the-foundation.md"), "utf8");
@@ -69,6 +74,7 @@ function install({ target, project, profile, adopt = false, hooks = false, claud
     ...files.map(([path]) => path),
     ...trees.map(([, to]) => to),
     ...SCRIPTS.map((s) => `scripts/${s}`),
+    "harness.lock",
   ].filter((path) => existsSync(join(target, path)));
   if (collisions.length) {
     throw new Error(`${collisions.length} path(s) already exist — pass --force to overwrite:\n  ${collisions.join("\n  ")}`);
@@ -88,12 +94,19 @@ function install({ target, project, profile, adopt = false, hooks = false, claud
   // cpSync does not reliably carry the executable bit, and git silently ignores a hook it cannot run.
   if (hooks) chmodSync(join(target, ".githooks/pre-push"), 0o755);
 
+  // The lock ships with the copy, filtered to what this install actually wrote: a target without
+  // `--claude` must not be told it is missing a vendor layer it never asked for (D-033).
+  const lock = manifest();
+  lock.files = Object.fromEntries(Object.entries(lock.files).filter(([path]) => existsSync(join(target, path))));
+  writeFileSync(join(target, "harness.lock"), `${JSON.stringify(lock, null, 2)}\n`);
+
   execFileSync(process.execPath, [join(target, "scripts/harness-status.mjs")], { stdio: "pipe" });
   return [
     ...files.map(([p]) => p),
     ...trees.map(([, t]) => `${t}/`),
     ...SCRIPTS.map((s) => `scripts/${s}`),
     ...empty.map((d) => `${d}/`),
+    "harness.lock",
     "STATUS.md",
   ];
 }

@@ -1,6 +1,6 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { writeFileSync, appendFileSync } from "node:fs";
+import { writeFileSync, appendFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { makeRepo, cleanup, lint, task, decision, version, trace } from "./helpers/fixture.mjs";
 
@@ -51,10 +51,31 @@ test("a task referencing a decision with no file is rejected", () => {
     "docs/tasks/T-001-a.md", /references decision D-042, which has no file/);
 });
 
-test("a task over its line budget is rejected, and the message says to split it", () => {
+test("a task whose plan is over budget is rejected, and the message says to split it", () => {
   const root = makeRepo({ tasks: { "T-001-a.md": task() } });
   appendFileSync(join(root, "docs/tasks/T-001-a.md"), "filler\n".repeat(120));
-  rejects(root, "docs/tasks/T-001-a.md", /lines exceeds the 120-line budget — split the task/);
+  rejects(root, "docs/tasks/T-001-a.md", /plan is \d+ lines, plan budget is 120 — split the task/);
+});
+
+// The split is what makes these two separate failures: a record long enough to fail on its own sits
+// under a plan that never moved (D-030).
+test("a task whose record is over budget is rejected without touching the plan", () => {
+  const root = makeRepo({ tasks: { "T-001-a.md": task() } });
+  appendFileSync(join(root, "docs/tasks/T-001-a.md"), `\n## Outcome\n\n${"- done\n".repeat(61)}`);
+  rejects(root, "docs/tasks/T-001-a.md", /record is \d+ lines, record budget is 60 — compress the record/);
+});
+
+test("a budget the linter reads but harness.json omits fails, naming the key", () => {
+  const root = makeRepo({ tasks: { "T-001-a.md": task() } });
+  const cfg = JSON.parse(readFileSync(join(root, "harness.json"), "utf8"));
+  delete cfg.budgets.taskPlanLines;
+  writeFileSync(join(root, "harness.json"), `${JSON.stringify(cfg, null, 2)}\n`);
+  rejects(root, "harness.json", /budget contract missing `taskPlanLines`, which harness-lint enforces/);
+});
+
+test("a budget harness.json declares that no check reads fails too", () => {
+  rejects(makeRepo({ config: { budgets: { journalEntryLines: 1 } }, tasks: { "T-001-a.md": task() } }),
+    "harness.json", /budget contract declares `journalEntryLines`, which harness-lint does not enforce/);
 });
 
 test("under solo, a task past `ready` needs an inline trace; a `ready` task does not", () => {
@@ -143,6 +164,14 @@ test("a harness version VERSION.md never declared is rejected", () => {
 
   assert.equal(lint(makeRepo({ tasks: { "T-001-a.md": task() }, sdd: { "VERSION.md": version("0.1.0", "0.2.0") } })).code,
     0, "a declared version passes");
+});
+
+// D-032 moved the history out of the rules budget. A repository that has not moved keeps working
+// through the fallback, and one that has is read — and blamed — at the new path.
+test("a repository whose history has moved is read from CHANGELOG.md, and the failure names it", () => {
+  const root = makeRepo({ tasks: { "T-001-a.md": task({ harness: "9.9.9" }) }, sdd: { "VERSION.md": version("0.2.0") } });
+  writeFileSync(join(root, "CHANGELOG.md"), version("0.3.0").replace("# Harness Version", "# Changelog"));
+  rejects(root, "docs/tasks/T-001-a.md", /is not a version in CHANGELOG\.md \(0\.3\.0\)/);
 });
 
 test("the version rule is skipped when VERSION.md declares nothing", () => {

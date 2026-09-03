@@ -2,7 +2,7 @@
 
 # Status — sdd-harness
 
-Harness `0.7.1` · profile `solo`
+Harness `0.9.0` · profile `solo`
 
 ## Tasks
 
@@ -25,6 +25,10 @@ Harness `0.7.1` · profile `solo`
 | [T-015](docs/tasks/T-015-stop-hook-schema-shape.md) | `done` | Correct `.claude/settings.json` and the shipped `templates/claude/settings.json` to Claude Code's two-level hook schema, so the Stop gate that D-017 installed is actually executed rather than silently discarded, and pin the shape with the existing install test. |
 | [T-016](docs/tasks/T-016-release-0-7-1.md) | `done` | Publish the T-015 schema fix as 0.7.1, widening the PATCH definition to admit fixes that restore documented behavior, and tell adopters who ran `--claude` before it that the gate they installed never fired. |
 | [T-017](docs/tasks/T-017-package-version-pin.md) | `done` | Correct `package.json` to the `0.7.1` the harness declares, and pin the two together with a test so the release version cannot drift out of the package manifest again. |
+| [T-018](docs/tasks/T-018-adopt-plan-and-record-budgets.md) | `done` | Release 0.8.0 and 0.8.1 here — the task budget split into plan and record, and the budget |
+| [T-019](docs/tasks/T-019-split-ignores-fenced-headings.md) | `done` | Correct `taskBudgetSections` so a `## Outcome` inside a fenced code block does not split a |
+| [T-020](docs/tasks/T-020-changelog-out-of-the-rules-budget.md) | `done` | Move the release history from `docs/sdd/VERSION.md` to `CHANGELOG.md` at the root, move the |
+| [T-021](docs/tasks/T-021-harness-lock.md) | `done` | Generate a hash manifest of the vendored governance surface, install it with the harness, and |
 
 ## Next
 
@@ -36,10 +40,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-09-03 | T-021 | done | harness.lock: the linter tells a copy from a fork | 17 files | tests 107/107, lint clean, docs/sdd 528/650 | D-033
+- 2026-09-03 | T-020 | done | the release history leaves the rules budget for CHANGELOG.md | 9 files | tests 101/101, lint clean, docs/sdd 526/650 | D-032
+- 2026-09-03 | T-019 | done | the split stops counting a quoted heading as a record | 6 files | tests 99/99, lint clean, docs/sdd 649/650 | -
+- 2026-09-03 | T-018 | done | plan and record budgets, and the contract the linter checks both ways | 17 files | tests 97/97, lint clean, docs/sdd 648/650 | D-030,D-031
 - 2026-09-03 | T-017 | done | package.json pinned to the declared harness version, 0.7.1 | 5 files | tests 90/90, lint clean | -
-- 2026-08-28 | T-016 | done | 0.7.1: the dead Stop gate recorded, PATCH widened, adopters told | 6 files | tests 89/89, lint clean | D-029
-- 2026-08-28 | T-015 | done | Stop hook rewritten to the two-level schema; the gate was never firing | 3 files | tests 89/89, lint clean | —
-- 2026-08-27 | T-014 | done | README rewritten for adopters; its facts pinned by tests | 2 files | tests 89/89, lint clean | D-028
-- 2026-08-27 | T-013 | done | enforcement moved to a git pre-push hook; any agent, or none | 12 files | tests 85/85, lint clean | D-027
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

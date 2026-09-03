@@ -16,7 +16,7 @@ The harness has four record types. All are files; the filesystem is the whole st
 | `decisions` | list | no | `D-###` ids; each must have a file. |
 
 Body sections: Sources, Scope, Out of Scope, Acceptance Criteria, Verification, Assumptions, Risks,
-Outcome, Review, Trace, and — under `team` — Validation. Budget: 120 lines, trace block 25.
+Outcome, Review, Trace, and — under `team` — Validation. Budgets: plan 120, record 60, trace 25.
 
 ## Decision — `docs/decisions/D-###-<slug>.md`
 

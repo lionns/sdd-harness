@@ -36,3 +36,7 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-027](D-027-vendor-neutral-enforcement.md) | 2026-08-27 | Enforcement is a git hook; vendor layers are accelerators | `accepted` | none |
 | [D-028](D-028-readme-is-for-adopters.md) | 2026-08-27 | The README is for adopters; contributors read AGENTS.md | `accepted` | none |
 | [D-029](D-029-patch-admits-restored-behavior.md) | 2026-08-28 | `PATCH` admits fixes that restore documented behavior | `accepted` | none |
+| [D-030](D-030-task-budget-plan-and-record.md) | 2026-09-03 | Split the task budget: the plan and the record are not one number | `accepted` | partially D-009 |
+| [D-031](D-031-budget-contract-both-ways.md) | 2026-09-03 | The linter and `harness.json` must agree on which budgets exist | `accepted` | none |
+| [D-032](D-032-changelog-is-history-not-rules.md) | 2026-09-03 | The changelog is history, and the rules budget should not hold it | `accepted` | none |
+| [D-033](D-033-installed-harness-is-a-copy.md) | 2026-09-03 | An installed harness is a copy, and the linter can say so | `accepted` | none |
