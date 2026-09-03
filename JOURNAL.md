@@ -21,3 +21,8 @@
 2026-08-28 | T-015 | done | Stop hook rewritten to the two-level schema; the gate was never firing | 3 files | tests 89/89, lint clean | —
 2026-08-28 | T-016 | done | 0.7.1: the dead Stop gate recorded, PATCH widened, adopters told | 6 files | tests 89/89, lint clean | D-029
 2026-09-03 | T-017 | done | package.json pinned to the declared harness version, 0.7.1 | 5 files | tests 90/90, lint clean | -
+2026-09-03 | T-018 | done | plan and record budgets, and the contract the linter checks both ways | 17 files | tests 97/97, lint clean, docs/sdd 648/650 | D-030,D-031
+2026-09-03 | T-019 | done | the split stops counting a quoted heading as a record | 6 files | tests 99/99, lint clean, docs/sdd 649/650 | -
+2026-09-03 | T-020 | done | the release history leaves the rules budget for CHANGELOG.md | 9 files | tests 101/101, lint clean, docs/sdd 526/650 | D-032
+2026-09-03 | T-021 | done | harness.lock: the linter tells a copy from a fork | 17 files | tests 107/107, lint clean, docs/sdd 528/650 | D-033
+2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
