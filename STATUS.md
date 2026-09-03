@@ -29,6 +29,7 @@ Harness `0.9.0` · profile `solo`
 | [T-019](docs/tasks/T-019-split-ignores-fenced-headings.md) | `done` | Correct `taskBudgetSections` so a `## Outcome` inside a fenced code block does not split a |
 | [T-020](docs/tasks/T-020-changelog-out-of-the-rules-budget.md) | `done` | Move the release history from `docs/sdd/VERSION.md` to `CHANGELOG.md` at the root, move the |
 | [T-021](docs/tasks/T-021-harness-lock.md) | `done` | Generate a hash manifest of the vendored governance surface, install it with the harness, and |
+| [T-022](docs/tasks/T-022-lock-diagnostics-and-portability.md) | `done` | Close the six review findings the 0.9.0 pull requests drew — a garbled failure message, an |
 
 ## Next
 
@@ -40,10 +41,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
 - 2026-09-03 | T-021 | done | harness.lock: the linter tells a copy from a fork | 17 files | tests 107/107, lint clean, docs/sdd 528/650 | D-033
 - 2026-09-03 | T-020 | done | the release history leaves the rules budget for CHANGELOG.md | 9 files | tests 101/101, lint clean, docs/sdd 526/650 | D-032
 - 2026-09-03 | T-019 | done | the split stops counting a quoted heading as a record | 6 files | tests 99/99, lint clean, docs/sdd 649/650 | -
 - 2026-09-03 | T-018 | done | plan and record budgets, and the contract the linter checks both ways | 17 files | tests 97/97, lint clean, docs/sdd 648/650 | D-030,D-031
-- 2026-09-03 | T-017 | done | package.json pinned to the declared harness version, 0.7.1 | 5 files | tests 90/90, lint clean | -
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

@@ -25,3 +25,4 @@
 2026-09-03 | T-019 | done | the split stops counting a quoted heading as a record | 6 files | tests 99/99, lint clean, docs/sdd 649/650 | -
 2026-09-03 | T-020 | done | the release history leaves the rules budget for CHANGELOG.md | 9 files | tests 101/101, lint clean, docs/sdd 526/650 | D-032
 2026-09-03 | T-021 | done | harness.lock: the linter tells a copy from a fork | 17 files | tests 107/107, lint clean, docs/sdd 528/650 | D-033
+2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
