@@ -45,6 +45,26 @@
         "templates/",
         "D-012"
       ]
+    },
+    {
+      "id": "FR-7",
+      "statement": "An opt-in lean task uses a compact contract and closes only with executed check records, observable behavior evidence, residual risk, and explicit human acceptance.",
+      "sources": ["D-034", "pilot/contract.md"]
+    },
+    {
+      "id": "FR-8",
+      "statement": "Parallel lean work declares separate ownership, integration, and an independent verifier before closure.",
+      "sources": ["D-034", "pilot/README.md"]
+    },
+    {
+      "id": "FR-9",
+      "statement": "The pilot compares paired standard and lean runs across elapsed time, tokens, cost, human review, acceptance, rework, and escaped defects without inventing missing telemetry.",
+      "sources": ["D-034", "pilot/summarize.mjs"]
+    },
+    {
+      "id": "FR-10",
+      "statement": "Installing lean is one command and does not change the default standard workflow.",
+      "sources": ["D-034", "scripts/harness-init.mjs"]
     }
   ],
   "nonFunctional": [

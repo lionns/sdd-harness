@@ -2,13 +2,13 @@
 
 # Status — sdd-harness
 
-Harness `0.9.0` · profile `solo`
+Harness `0.10.0` · profile `solo`
 
 ## Tasks
 
 | Task | State | Goal |
 |---|---|---|
-| [T-023](docs/tasks/T-023-lean-workflow-experiment.md) | `doing` | Test whether a smaller task contract and evidence-led closure reduce agent cost and human review time without lowering delivered quality. |
+| [T-024](docs/tasks/T-024-measure-lean-workflow.md) | `ready` | Compare lean and standard on comparable work in adopting projects before proposing a default change. |
 | [T-001](docs/tasks/T-001-harness-self-baseline.md) | `done` | Give this repo the green baseline it demands of every project it is copied into — real quality gates and an automated test suite for the two scripts that enforce the harness. |
 | [T-002](docs/tasks/T-002-script-path-resolution.md) | `done` | Make the two scripts work when the repo path contains a symlink or a space, and stop the docs/sdd line count from disagreeing with the linter's own. |
 | [T-003](docs/tasks/T-003-adoption-templates.md) | `done` | Give adopters a pristine `templates/` tree to copy — including the `CLAUDE.md` entry point the harness needs to take effect — and let `docs/project/` hold this repo's real specifications instead of a mix of both. |
@@ -31,21 +31,22 @@ Harness `0.9.0` · profile `solo`
 | [T-020](docs/tasks/T-020-changelog-out-of-the-rules-budget.md) | `done` | Move the release history from `docs/sdd/VERSION.md` to `CHANGELOG.md` at the root, move the |
 | [T-021](docs/tasks/T-021-harness-lock.md) | `done` | Generate a hash manifest of the vendored governance surface, install it with the harness, and |
 | [T-022](docs/tasks/T-022-lock-diagnostics-and-portability.md) | `done` | Close the six review findings the 0.9.0 pull requests drew — a garbled failure message, an |
+| [T-023](docs/tasks/T-023-lean-workflow-experiment.md) | `done` | Make the four lean-workflow changes installable and verifiable in test projects while preserving the standard workflow. |
 
 ## Next
 
-**T-023** (`doing`) — Test whether a smaller task contract and evidence-led closure reduce agent cost and human review time without lowering delivered quality.
+**T-024** (`ready`) — Compare lean and standard on comparable work in adopting projects before proposing a default change.
 
 ## Open decisions
 
-- D-034 — Trial evidence before adding workflow ceremony — `proposed`, needs human approval
+None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-09-26 | T-023 | done | opt-in lean workflow ready for fresh-project trials | 32 files | tests 118/118, lint clean | D-034
 - 2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
 - 2026-09-03 | T-021 | done | harness.lock: the linter tells a copy from a fork | 17 files | tests 107/107, lint clean, docs/sdd 528/650 | D-033
 - 2026-09-03 | T-020 | done | the release history leaves the rules budget for CHANGELOG.md | 9 files | tests 101/101, lint clean, docs/sdd 526/650 | D-032
 - 2026-09-03 | T-019 | done | the split stops counting a quoted heading as a record | 6 files | tests 99/99, lint clean, docs/sdd 649/650 | -
-- 2026-09-03 | T-018 | done | plan and record budgets, and the contract the linter checks both ways | 17 files | tests 97/97, lint clean, docs/sdd 648/650 | D-030,D-031
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

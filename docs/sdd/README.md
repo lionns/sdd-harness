@@ -5,7 +5,7 @@ Load only what the task needs. Do not read every harness document by default.
 ## Start Here, Always
 
 1. `STATUS.md` (repo root) — current state of every task, decision, and journal entry.
-2. `harness.json` (repo root) — active harness version and profile.
+2. `harness.json` (repo root) — active harness version, profile, and workflow.
 3. The assigned task file in `docs/tasks/`.
 
 If those three answer the question, stop reading.
@@ -14,6 +14,7 @@ If those three answer the question, stop reading.
 
 `harness.json` declares the active profile: `solo` or `team`. It decides roles, required records,
 and gates. The comparison and the normative definitions are in `HARNESS.md` § Profiles.
+`workflow: lean` adds the opt-in task path in `pilot/README.md`; `standard` is the default.
 
 ## The Five Documents
 

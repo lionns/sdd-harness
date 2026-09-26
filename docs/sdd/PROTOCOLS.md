@@ -38,6 +38,21 @@ When handing work to another agent or session: what was read, what was concluded
 uncertain, which files changed, which checks passed or failed, which source to read next. Short
 enough to fit in the task file without duplicating the underlying documents.
 
+### Lean evidence and agent selection
+
+In `workflow: lean`, run configured baseline, task-specific, and final commands through
+`scripts/harness-evidence.mjs` using `T-### <phase> -- <command> [args...]`. The command records
+its real exit code in `docs/evidence/<task>.json`, including failures. A passing record is necessary
+but does not prove the claimed behavior; give the reviewer a direct observation or reproducible
+artifact and disclose what remains unverified. Keep a task in `review` until the human accepts
+the behavior and any durable decision. Do not put secrets in command output.
+
+Use one agent by default. Parallel implementers require separate file or interface ownership and
+isolated checkouts. Integrate in one checkout and run the common final check there. Give an
+independent verifier the goal, sources, and diff; it checks behavior without inheriting the
+implementer's conclusion. The task's `## Agents` section records mode, owners, integration, and
+verifier. Count every agent and the human's attention in the pilot measurement.
+
 ## Trace
 
 A trace is an operational record: enough evidence to explain and audit what happened, nothing more.

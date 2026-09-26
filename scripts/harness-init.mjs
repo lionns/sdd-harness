@@ -16,6 +16,7 @@ import { manifest } from "./harness-manifest.mjs";
 
 const PROFILES = ["solo", "team"];
 const SCRIPTS = ["harness-status.mjs", "harness-lint.mjs"];
+const WORKFLOWS = ["standard", "lean"];
 
 
 function parseArgs(argv) {
@@ -36,9 +37,9 @@ function parseArgs(argv) {
  * (D-020). Brownfield declares none — an existing repo with work in flight would go red on arrival —
  * and instead ships the task that records what the code already does and then declares them.
  */
-export function plan({ project, profile, adopt = false, root = ROOT }) {
+export function plan({ project, profile, workflow = "standard", adopt = false, root = ROOT }) {
   const version = config(root).harness;
-  const harness = { ...JSON.parse(readFileSync(join(root, "templates/harness.json"), "utf8")), project, profile };
+  const harness = { ...JSON.parse(readFileSync(join(root, "templates/harness.json"), "utf8")), project, profile, workflow };
   harness.harness = version;
   harness.foundation = adopt ? [] : FOUNDATION_TOPICS;
   const files = [
@@ -52,17 +53,21 @@ export function plan({ project, profile, adopt = false, root = ROOT }) {
   ];
   if (adopt) {
     const seed = readFileSync(join(root, "templates/T-001-record-the-foundation.md"), "utf8");
-    files.push(["docs/tasks/T-001-record-the-foundation.md", seed.replace("__HARNESS__", version)]);
+    const bootstrap = seed.replace("__HARNESS__", version);
+    files.push(["docs/tasks/T-001-record-the-foundation.md",
+      workflow === "lean" ? bootstrap.replace(/^harness: .*$/m, `harness: ${version}\nworkflow: standard`) : bootstrap]);
   }
   return files;
 }
 
-function install({ target, project, profile, adopt = false, hooks = false, claude = false, force = false }) {
-  const files = plan({ project, profile, adopt });
+function install({ target, project, profile, workflow = "standard", adopt = false, hooks = false, claude = false, force = false }) {
+  const files = plan({ project, profile, workflow, adopt });
+  const scripts = workflow === "lean" ? [...SCRIPTS, "harness-evidence.mjs"] : SCRIPTS;
   const trees = [
     ["docs/sdd", "docs/sdd"],
     ["templates/project", "docs/project"],
     ["scripts/lib", "scripts/lib"],
+    ...(workflow === "lean" ? [["pilot", "pilot"]] : []),
     // The neutral gate: git runs it for every agent, and for a human using none (D-027).
     ...(hooks ? [["templates/githooks", ".githooks"]] : []),
     // Standalone `.claude/`, not a plugin: checked into the adopting repo, so every teammate gets it
@@ -73,7 +78,7 @@ function install({ target, project, profile, adopt = false, hooks = false, claud
   const collisions = force ? [] : [
     ...files.map(([path]) => path),
     ...trees.map(([, to]) => to),
-    ...SCRIPTS.map((s) => `scripts/${s}`),
+    ...scripts.map((s) => `scripts/${s}`),
     "harness.lock",
   ].filter((path) => existsSync(join(target, path)));
   if (collisions.length) {
@@ -81,7 +86,7 @@ function install({ target, project, profile, adopt = false, hooks = false, claud
   }
 
   for (const [from, to] of trees) cpSync(join(ROOT, from), join(target, to), { recursive: true });
-  for (const script of SCRIPTS) cpSync(join(ROOT, "scripts", script), join(target, "scripts", script));
+  for (const script of scripts) cpSync(join(ROOT, "scripts", script), join(target, "scripts", script));
 
   // Before the files: the brownfield seed task lands inside `docs/tasks/`, which does not exist yet.
   const empty = ["docs/tasks", "docs/decisions", ...(profile === "team" ? ["docs/traces"] : [])];
@@ -104,7 +109,7 @@ function install({ target, project, profile, adopt = false, hooks = false, claud
   return [
     ...files.map(([p]) => p),
     ...trees.map(([, t]) => `${t}/`),
-    ...SCRIPTS.map((s) => `scripts/${s}`),
+    ...scripts.map((s) => `scripts/${s}`),
     ...empty.map((d) => `${d}/`),
     "harness.lock",
     "STATUS.md",
@@ -113,12 +118,17 @@ function install({ target, project, profile, adopt = false, hooks = false, claud
 
 const args = parseArgs(process.argv.slice(2));
 if (!args.target || !args.project) {
-  console.error("usage: harness-init <target> --project=<name> [--profile=solo|team] [--adopt] [--hooks] [--claude] [--force]");
+  console.error("usage: harness-init <target> --project=<name> [--profile=solo|team] [--workflow=standard|lean] [--adopt] [--hooks] [--claude] [--force]");
   process.exit(1);
 }
 const profile = args.profile === true || args.profile === undefined ? "solo" : args.profile;
 if (!PROFILES.includes(profile)) {
   console.error(`harness-init: profile must be one of ${PROFILES.join(" | ")}, got "${profile}"`);
+  process.exit(1);
+}
+const workflow = args.workflow === true || args.workflow === undefined ? "standard" : args.workflow;
+if (!WORKFLOWS.includes(workflow)) {
+  console.error(`harness-init: workflow must be one of ${WORKFLOWS.join(" | ")}, got "${workflow}"`);
   process.exit(1);
 }
 
@@ -127,8 +137,8 @@ mkdirSync(target, { recursive: true });
 try {
   const adopt = Boolean(args.adopt);
   const hooks = Boolean(args.hooks);
-  const written = install({ target, project: args.project, profile, adopt, hooks, claude: Boolean(args.claude), force: Boolean(args.force) });
-  const flags = [profile, adopt && "adopt", hooks && "hooks", args.claude && "claude"].filter(Boolean).join(", ");
+  const written = install({ target, project: args.project, profile, workflow, adopt, hooks, claude: Boolean(args.claude), force: Boolean(args.force) });
+  const flags = [profile, workflow, adopt && "adopt", hooks && "hooks", args.claude && "claude"].filter(Boolean).join(", ");
   console.log(`harness-init: installed ${config().harness} (${flags}) into ${target}`);
   for (const path of written) console.log(`  ${path}`);
 
@@ -145,6 +155,7 @@ try {
   console.log(adopt
     ? "\nNext: work T-001. Record what this codebase already decides, one accepted decision per topic, then declare them in harness.json."
     : `\nNext: fill docs/project/brief.md, then settle the foundation — one accepted decision per topic in ${FOUNDATION_TOPICS.join(", ")}. No task leaves \`ready\` until they exist.`);
+  if (workflow === "lean") console.log("  Lean pilot: read pilot/README.md and copy pilot/contract.md for the next task.");
 } catch (error) {
   console.error(`harness-init: ${error.message}`);
   process.exit(1);

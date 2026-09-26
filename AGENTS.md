@@ -6,7 +6,7 @@ imposes on every project that adopts it.
 ## Read first, every session
 
 1. `STATUS.md` — every task, decision, and journal entry, in one generated file.
-2. `harness.json` — the active harness version, profile, and record budgets.
+2. `harness.json` — the active harness version, profile, workflow, and record budgets.
 3. The assigned task file in `docs/tasks/`.
 
 If those three answer the question, stop reading. `docs/sdd/README.md` is the routing index.

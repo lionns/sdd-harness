@@ -44,6 +44,65 @@ test("an installed harness passes its own status and lint gates", () => {
   assert.match(lint.stdout, /harness-lint: clean \(0 tasks, 0 decisions/);
 });
 
+test("lean install records real checks and closes a task only after human acceptance", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=pilot-app", "--workflow=lean", "--adopt").code, 0);
+  assert.equal(JSON.parse(readFileSync(join(dir, "harness.json"), "utf8")).workflow, "lean");
+  assert.ok(existsSync(join(dir, "pilot/contract.md")) && existsSync(join(dir, "scripts/harness-evidence.mjs")));
+  const lock = JSON.parse(readFileSync(join(dir, "harness.lock"), "utf8"));
+  assert.ok(lock.files["pilot/contract.md"] && lock.files["scripts/harness-evidence.mjs"]);
+  const task = readFileSync(join(dir, "pilot/contract.md"), "utf8")
+    .replace("T-###", "T-002").replace("status: ready", "status: review")
+    .replaceAll("- [ ]", "- [x]")
+    .replace("exact/path", "docs/project/brief.md")
+    .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/evidence/T-002.json and observed output")
+    .replace(/^(- Residual risk:) .*$/m, "$1 none");
+  writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task);
+  const evidence = (...args) => run(join(dir, "scripts/harness-evidence.mjs"), args, dir);
+  const ok = [process.execPath, "-e", "process.exit(0)"];
+  assert.equal(evidence("T-002", "baseline", "--", ...ok).code, 0);
+  assert.equal(evidence("T-002", "task-specific", "--", process.execPath, "-e", "process.exit(3)").code, 3);
+  assert.equal(evidence("T-002", "task-specific", "--", ...ok).code, 0);
+  assert.equal(evidence("T-002", "final", "--", ...ok).code, 0);
+  const records = JSON.parse(readFileSync(join(dir, "docs/evidence/T-002.json"), "utf8"));
+  assert.deepEqual(records.map((r) => r.exitCode), [0, 3, 0, 0]);
+  assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  assert.equal(inside(dir, "harness-lint.mjs").code, 0, "review is allowed while the human decides");
+  writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task.replace("status: review", "status: done"));
+  appendFileSync(join(dir, "JOURNAL.md"), "2026-09-26 | T-002 | done | pilot behavior | 1 file | checks green | -\n");
+  assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  assert.match(inside(dir, "harness-lint.mjs").stderr, /Human decision: accepted by <person>/);
+  writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task.replace("status: review", "status: done")
+    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner"));
+  assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  const lint = inside(dir, "harness-lint.mjs");
+  assert.equal(lint.code, 0, lint.stderr);
+});
+
+test("lean team install accepts its team contract with a trace and named validator", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=pilot-team", "--profile=team", "--workflow=lean", "--adopt").code, 0);
+  const task = readFileSync(join(dir, "pilot/contract-team.md"), "utf8")
+    .replace("T-###", "T-002").replace("status: ready", "status: done")
+    .replaceAll("- [ ]", "- [x]").replace("exact/path", "docs/project/brief.md")
+    .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/evidence/T-002.json")
+    .replace(/^(- Residual risk:) .*$/m, "$1 none")
+    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner")
+    .replace(/^(- Validated by:) .*$/m, "$1 owner");
+  writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task);
+  writeFileSync(join(dir, "docs/traces/2026-09-26_T-002_implementer.md"),
+    "## Trace\n\n- 2026-09-26 — read: brief · did: pilot · checks: recorded\n");
+  appendFileSync(join(dir, "JOURNAL.md"), "2026-09-26 | T-002 | done | pilot behavior | 1 file | checks green | -\n");
+  for (const phase of ["baseline", "task-specific", "final"]) {
+    const check = run(join(dir, "scripts/harness-evidence.mjs"),
+      ["T-002", phase, "--", process.execPath, "-e", "process.exit(0)"], dir);
+    assert.equal(check.code, 0, check.stderr);
+  }
+  assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  const lint = inside(dir, "harness-lint.mjs");
+  assert.equal(lint.code, 0, lint.stderr);
+});
+
 test("the installed manifest carries the current version, project, and profile", () => {
   const dir = target();
   init(dir, "--project=my-app", "--profile=team");
@@ -136,6 +195,11 @@ test("bad arguments fail before anything is written", () => {
   const bad = init(dir, "--project=x", "--profile=duo");
   assert.equal(bad.code, 1);
   assert.match(bad.stderr, /profile must be one of solo \| team, got "duo"/);
+  assert.equal(existsSync(join(dir, "harness.json")), false);
+
+  const wrongWorkflow = init(dir, "--project=x", "--workflow=fast");
+  assert.equal(wrongWorkflow.code, 1);
+  assert.match(wrongWorkflow.stderr, /workflow must be one of standard \| lean/);
   assert.equal(existsSync(join(dir, "harness.json")), false);
 
   assert.equal(run(INIT, []).code, 1, "no target must fail");

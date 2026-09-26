@@ -1,6 +1,7 @@
 {
-  "harness": "0.9.0",
+  "harness": "0.10.0",
   "profile": "solo",
+  "workflow": "standard",
   "project": "sdd-harness",
   "foundation": [
     "runtime",

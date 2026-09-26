@@ -4,12 +4,12 @@ import { readFileSync } from "node:fs";
 
 const [file] = process.argv.slice(2);
 if (!file) {
-  console.error("Usage: node experiments/lean-workflow/summarize.mjs <runs.jsonl>");
+  console.error("Usage: node pilot/summarize.mjs <runs.jsonl>");
   process.exit(2);
 }
 
 const requiredText = ["pairId", "project", "taskId", "category", "mode", "agent", "model", "evidence"];
-const requiredNumber = ["elapsedMinutes", "humanReviewMinutes"];
+const requiredNumber = ["elapsedMinutes", "humanReviewMinutes", "coordinationMinutes", "agentCount"];
 const optionalNumber = ["inputTokens", "outputTokens", "costUsd", "reworkMinutes7d", "escapedDefects7d"];
 const grouped = new Map();
 let count = 0;
@@ -51,6 +51,24 @@ for (const [index, line] of source.split(/\r?\n/).entries()) {
       process.exit(2);
     }
   }
+  if (!Number.isInteger(run.agentCount) || run.agentCount < 1) {
+    console.error(`Line ${index + 1}: agentCount must be a positive integer`);
+    process.exit(2);
+  }
+  for (const key of ["independentVerifier", "behaviorObserved"]) {
+    if (typeof run[key] !== "boolean") {
+      console.error(`Line ${index + 1}: ${key} must be a boolean`);
+      process.exit(2);
+    }
+  }
+  if (run.integrationEvidence != null && (typeof run.integrationEvidence !== "string" || !run.integrationEvidence.trim())) {
+    console.error(`Line ${index + 1}: integrationEvidence must be null or nonempty text`);
+    process.exit(2);
+  }
+  if (run.agentCount > 1 && !run.integrationEvidence) {
+    console.error(`Line ${index + 1}: multi-agent run needs integrationEvidence`);
+    process.exit(2);
+  }
   for (const key of optionalNumber) {
     if (run[key] != null && (!Number.isFinite(run[key]) || run[key] < 0)) {
       console.error(`Line ${index + 1}: ${key} must be null or a nonnegative number`);
@@ -73,7 +91,7 @@ for (const [index, line] of source.split(/\r?\n/).entries()) {
 
 const pairs = [];
 const unpaired = [];
-const metricNames = ["elapsedMinutes", "humanReviewMinutes", "tokens", "costUsd", "reworkMinutes7d", "escapedDefects7d"];
+const metricNames = ["elapsedMinutes", "humanReviewMinutes", "coordinationMinutes", "tokens", "costUsd", "reworkMinutes7d", "escapedDefects7d"];
 const deltas = Object.fromEntries(metricNames.map((key) => [key, []]));
 const tokens = (run) => run.inputTokens == null || run.outputTokens == null
   ? null : run.inputTokens + run.outputTokens;
@@ -93,6 +111,7 @@ for (const [pairId, pair] of grouped) {
   const values = {
     elapsedMinutes: [current.elapsedMinutes, lean.elapsedMinutes],
     humanReviewMinutes: [current.humanReviewMinutes, lean.humanReviewMinutes],
+    coordinationMinutes: [current.coordinationMinutes, lean.coordinationMinutes],
     tokens: [tokens(current), tokens(lean)],
     costUsd: [current.costUsd, lean.costUsd],
     reworkMinutes7d: [current.reworkMinutes7d, lean.reworkMinutes7d],
@@ -108,6 +127,9 @@ for (const [pairId, pair] of grouped) {
     pairId, project: current.project, category: current.category,
     currentTask: current.taskId, leanTask: lean.taskId,
     accepted: { current: current.accepted, lean: lean.accepted },
+    behaviorObserved: { current: current.behaviorObserved, lean: lean.behaviorObserved },
+    agents: { current: current.agentCount, lean: lean.agentCount },
+    independentVerifier: { current: current.independentVerifier, lean: lean.independentVerifier },
     leanMinusCurrent: difference,
   });
 }
@@ -132,6 +154,10 @@ console.log(JSON.stringify({
   acceptance: {
     current: pairs.filter((pair) => pair.accepted.current).length,
     lean: pairs.filter((pair) => pair.accepted.lean).length,
+  },
+  observedBehavior: {
+    current: pairs.filter((pair) => pair.behaviorObserved.current).length,
+    lean: pairs.filter((pair) => pair.behaviorObserved.lean).length,
   },
   metrics,
   pairs,

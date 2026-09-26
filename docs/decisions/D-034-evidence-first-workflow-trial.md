@@ -1,6 +1,6 @@
 # D-034 — Trial evidence before adding workflow ceremony
 
-- Status: proposed
+- Status: accepted
 - Date: 2026-09-26
 - Supersedes: none
 - Tasks: T-023
@@ -14,17 +14,17 @@ have not been measured across adopting projects.
 
 ## Decision
 
-Trial an opt-in workflow in this branch: a short task contract before implementation, direct
-evidence and residual risk at closure, one agent by default, and separate agents only for work
-that has independent ownership and a common integration check. Measure costs and quality against
-the current 0.9.0 workflow before deciding whether to change the distributed harness.
+Ship an opt-in `lean` workflow in 0.10.0. It uses a short task contract, records executed checks,
+requires observable evidence and human acceptance at closure, and requires ownership, integration,
+and a verifier for parallel work. A paired-run tool compares total cost and quality with `standard`.
+The default workflow stays `standard`. The user approved applying these four changes on 2026-09-26.
 
 ## Consequences
 
 - The pilot cannot claim a gain from fewer lines alone; quality and human review time count.
 - Existing adopters and the default install keep their current contract during the trial.
-- A promoted workflow needs a separate accepted governance decision, version, migration path,
-  and tests for every changed script behavior.
+- The pilot mode is installable and tested; making it the default needs measured results and a
+  separate decision. Older task records keep their original workflow rules.
 - Missing token telemetry is reported as missing, not filled with estimates.
 
 ## References

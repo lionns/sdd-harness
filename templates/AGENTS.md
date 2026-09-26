@@ -10,6 +10,9 @@ This project runs the SDD harness. Work from written tasks; leave the records th
 
 If those three answer the question, stop reading. `docs/sdd/README.md` is the routing index for
 everything else — load a harness document only when the task needs it.
+If `harness.json` declares `workflow: lean`, use `pilot/contract.md` (or
+`pilot/contract-team.md` under `team`) for new tasks and
+`pilot/README.md` for the evidence, review, and agent coordination procedure.
 
 ## Rules that bind every change
 

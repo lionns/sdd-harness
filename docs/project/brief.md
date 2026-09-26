@@ -23,11 +23,13 @@ files to six and moved budgets from prose into an executable check.
 - The harness documents in `docs/sdd/`, the manifest `harness.json`, and the enforcement scripts.
 - Specification templates in `docs/project/` for the projects that adopt the harness.
 - Keeping the harness honest about itself: its own gates, tests, and records.
+- An opt-in lean workflow that shortens task records, grounds closure in executed checks and
+  observable behavior, coordinates independent agents, and measures total task cost.
 
 ### Out of Scope
 
 - Product features of any project that adopts the harness.
-- Editor, CI, or agent-runner integrations beyond the two Node scripts.
+- Editor, CI, or agent-runner integrations beyond the harness's Node tools.
 
 ## Constraints
 

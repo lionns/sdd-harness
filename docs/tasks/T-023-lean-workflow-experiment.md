@@ -1,12 +1,13 @@
 ---
 id: T-023
-title: Trial a lean, evidence-first agent workflow
-status: doing
+title: Make the lean agent workflow installable for testing
+status: done
 profile: solo
-harness: 0.9.0
+harness: 0.10.0
 role: Planner
-goal: Test whether a smaller task contract and evidence-led closure reduce agent cost and human review time without lowering delivered quality.
+goal: Make the four lean-workflow changes installable and verifiable in test projects while preserving the standard workflow.
 decisions: [D-034]
+implements: [FR-7, FR-8, FR-9, FR-10]
 ---
 
 ## Sources
@@ -19,38 +20,43 @@ decisions: [D-034]
 
 ## Scope
 
-- Run a controlled pilot of the current workflow and a smaller task contract.
+- Make the smaller task contract installable as `workflow: lean`, with `standard` as the control.
 - Keep scope, authority, observable acceptance, and a green baseline/final gate.
-- Replace repeated prose with compact references to direct evidence, including failed checks.
-- Record wall time, available token usage, agent cost, human review time, and later rework.
-- Test independent agent work only where tasks have separable inputs and integration checks.
+- Record executed baseline, task-specific, and final checks, including failures; close with
+  observable behavior evidence, residual risk, and explicit human acceptance.
+- Provide a paired-run format for wall time, available token usage, agent cost, human review,
+  coordination, observable behavior, and later rework.
+- Require independent ownership, integration, and verification records for parallel tasks.
 - Correct observed documentation drift and classify historical traceability warnings.
 
 ## Out of Scope
 
-- Claiming a productivity or quality improvement before pilot results exist.
-- Changing the default installed harness before the experiment is reviewed.
+- Running the real-project comparison or claiming a productivity gain before its results exist.
+- Changing the default `standard` workflow before the experiment is measured.
 - Adding a vendor-specific agent runner or runtime dependency.
 - Treating a hash lock as a permission or provenance guarantee.
 
 ## Acceptance Criteria
 
-- [ ] WHEN the pilot starts a task THE SYSTEM SHALL present a short contract with goal, source of truth, scope boundary, observable acceptance, and unresolved choices.
-- [ ] WHEN a pilot task closes THE SYSTEM SHALL retain check results and direct evidence for consequential claims, including failures and residual risk.
-- [ ] WHEN two agents work concurrently THE SYSTEM SHALL assign separable ownership and run a common integration check before closure.
-- [ ] WHEN pilot runs finish THE SYSTEM SHALL compare quality, human attention, elapsed time, and available token/cost measures against the current workflow.
-- [ ] The current installed workflow remains usable throughout the pilot.
+- [x] WHEN the pilot starts a task THE SYSTEM SHALL present a short contract with goal, source of truth, scope boundary, observable acceptance, and unresolved choices.
+- [x] WHEN a pilot task closes THE SYSTEM SHALL retain check results and direct evidence for consequential claims, including failures and residual risk.
+- [x] WHEN a lean task declares parallel agents THE SYSTEM SHALL require ownership, an integration
+  check, and a separate verifier before closure.
+- [x] WHEN paired pilot runs are supplied THE SYSTEM SHALL compare quality, human attention,
+  elapsed time, and available token/cost measures without filling in missing data.
+- [x] The current installed workflow remains usable throughout the pilot.
 
 ## Verification
 
 - Baseline: `npm run check`
 - Final: `npm run check`
-- Task-specific: use pilot tasks from more than one adopting project and review their artifacts and delivered behavior independently of the agent's closure note.
+- Task-specific: `tests/init.test.mjs` installs and closes solo and team lean tasks with the real
+  CLI; `tests/lean-experiment.test.mjs` checks evidence and paired comparisons.
 
 ## Assumptions
 
 - **Assumption:** usage and token telemetry varies by agent, so missing measurements must remain missing rather than estimated.
-- **Assumption:** a meaningful pilot needs real work in adopting projects; this repository alone tests mechanics, not productivity.
+- **Assumption:** real adopting-project work is required to measure productivity (T-024).
 
 ## Risks
 
@@ -64,12 +70,29 @@ decisions: [D-034]
   invent provenance; verify each link against implementation and tests before adding one.
 - The 600-line figure in `AGENTS.md` and `docs/project/brief.md` had drifted from the active
   `harness.json` budget of 650; both now refer to the active configuration.
-- The pilot contract passes the existing 0.9 solo linter when populated and closed. No adopter
-  run has yet shown a token, time, or quality gain.
+- The opt-in 0.10 `lean` install passes solo and team closure tests; `standard` remains the default.
+  No adopter run has yet shown a token, time, or quality gain.
+
+## Outcome
+
+- Delivered: installable `lean` mode, compact solo/team contracts, executed-check evidence,
+  human acceptance and parallel coordination gates, plus a paired cost-and-quality comparator.
+- Evidence: solo and team installation tests execute the CLI and close real fixture tasks;
+  measurement tests reject unmatched models and missing multi-agent integration evidence.
+- Checks: baseline 114/114; final 118/118 and lint clean. A failed task-specific command is
+  preserved in the evidence log before a later passing command.
+- Residual risk: no real adopter comparison yet; command exit codes and record shape do not prove
+  the cited behavior is correct. In-place upgrades of 0.9 installs are not supported.
+- Follow-up: T-024 runs the measured pilot in real projects.
 
 ## Trace
 
 - 2026-09-26 — read: baseline `npm run check`, current templates, T-010 and active budget
   · did: created opt-in contract, paired-run guide, summary tool, tests, and drift correction
-  · checks: baseline 111/111; compact contract closure test 3/3; full final gate pending
+  · checks: baseline 111/111; compact contract closure test 3/3
   · assumption: real adopter runs are needed to measure benefit.
+- 2026-09-26 — read: user approval to apply all four changes · did: added installable lean mode,
+  executed-check evidence, human closure gate, parallel ownership gate, measurement fields, team
+  contract, version 0.10.0 and D-034 acceptance · checks: 118/118, lint clean
+  · blocker: automatic review rejected an in-place 0.9 upgrade because it would overwrite existing
+  files and the draft rollback was unsafe; test in a fresh directory until a safe migration is approved.

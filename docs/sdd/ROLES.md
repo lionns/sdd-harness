@@ -18,7 +18,8 @@
 
 ## Roles
 
-In `solo`, only the first three exist; the others are hats the same agent wears, not separate roles.
+In `standard` `solo`, the first three are hats one agent wears. In `lean`, role names describe
+responsibilities; agent count follows independent ownership and review risk, not the number of rows.
 
 | Role | Owns | Outputs |
 |---|---|---|

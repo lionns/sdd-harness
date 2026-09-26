@@ -20,6 +20,8 @@ export const VENDORED = [
   ["scripts/lib", "scripts/lib"],
   ["scripts/harness-status.mjs", "scripts/harness-status.mjs"],
   ["scripts/harness-lint.mjs", "scripts/harness-lint.mjs"],
+  ["scripts/harness-evidence.mjs", "scripts/harness-evidence.mjs"],
+  ["pilot", "pilot"],
   ["templates/githooks", ".githooks"],
   ["templates/claude", ".claude"],
 ];

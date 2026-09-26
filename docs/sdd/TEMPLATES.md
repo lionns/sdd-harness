@@ -1,5 +1,10 @@
 # Templates
 
+For an installed `workflow: lean`, copy `pilot/contract.md` (or `contract-team.md`) instead of the standard task file
+below. Its `## Outcome` records only behavior evidence, checks, residual risk, and human decision;
+the diff and command records carry the rest. A decision file is still for a choice that constrains
+future work, not an ordinary implementation preference.
+
 ## Task File
 
 `docs/tasks/<ID>-<slug>.md`. Budgets: plan 120 lines; record 60, split at the first `## Outcome`.

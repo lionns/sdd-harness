@@ -2,7 +2,7 @@
 
 Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Version **0.9.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
+Version **0.10.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## The problem it solves
 
@@ -27,6 +27,7 @@ node scripts/harness-init.mjs ../my-app --project=my-app --hooks
 |---|---|
 | `--project=<name>` | required |
 | `--profile=solo\|team` | `solo` is three roles, an inline trace, implicit validation. `team` is seven roles, trace files, an explicit validation gate. Default `solo` |
+| `--workflow=standard\|lean` | `standard` is the current task flow. `lean` installs `pilot/`, recorded check evidence, explicit human acceptance, and agent coordination. Default `standard` |
 | `--hooks` | installs `.githooks/pre-push`, which refuses a push whose records are invalid. Git runs it for every agent, and for a human using none |
 | `--claude` | adds a Claude Code `Stop` hook and three skills, catching a bad record a turn earlier. Optional, holds no rules |
 | `--adopt` | the repository already has code — see below |
@@ -34,7 +35,15 @@ node scripts/harness-init.mjs ../my-app --project=my-app --hooks
 
 You get `docs/sdd/`, blank specification templates in `docs/project/`, the two enforcement scripts,
 `harness.json`, `JOURNAL.md`, and an `AGENTS.md` telling the agent to read `STATUS.md` first. The
-result is lint-clean on arrival.
+result is lint-clean on arrival. Lean also installs its evidence script and `pilot/` guide.
+
+To test the four lean changes in a separate project, install with `--workflow=lean` and read
+[`pilot/README.md`](pilot/README.md). It gives a compact task contract, records executed checks,
+keeps the human's review on behavior and durable decisions, uses parallel agents only for
+independent work, and compares full task cost with `standard`. Tokens and human review time are
+entered from actual observations; the harness does not infer them.
+Use a new test directory for the lean install. Do not use `--force` to turn an existing 0.9
+installation into a pilot: that flag can overwrite project-owned files.
 
 `--hooks` sets `core.hooksPath` when the target is already a git repo, otherwise it prints the one
 command. That setting is per clone, so run `node scripts/harness-lint.mjs` in CI as the backstop.

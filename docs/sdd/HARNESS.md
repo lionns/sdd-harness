@@ -27,7 +27,8 @@ One person plus agents. Roles collapse to **Planner · Implementer · Reviewer**
 
 ### `team`
 
-Multiple people or multiple agent families. All seven roles in `ROLES.md` apply.
+Multiple people or multiple agent families. `ROLES.md` describes seven responsibilities;
+the lean workflow instantiates agents only where work can be separated or reviewed independently.
 
 - Traces are separate files in `docs/traces/`, one per role per task.
 - Human validation is an explicit gate with a named validator.
@@ -35,6 +36,16 @@ Multiple people or multiple agent families. All seven roles in `ROLES.md` apply.
 
 Both profiles keep the baseline gate and the final acceptance gate. Those gates prevent building on
 a broken tree and cost no documentation.
+
+## Opt-in lean workflow
+
+`profile` controls trace and human validation, not the number of agents. `workflow` controls the task contract. The default
+`standard` keeps the flow below. `lean` installs `pilot/` and an evidence command. Copy
+the matching `pilot/contract*.md` for a new task and follow `pilot/README.md`. A lean task cannot close without
+recorded passing commands for baseline, task-specific behavior, and final integration; a behavior
+reference, residual risk, and explicit human acceptance. Parallel work additionally names separate
+ownership, integration, and a verifier. The linter checks records and command exit codes, not the
+truth of a source or the quality of the behavior: the human inspects those directly.
 
 ## Inception
 

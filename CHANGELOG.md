@@ -4,6 +4,14 @@ Every released version of the SDD harness, newest first. The rules that govern a
 `MAJOR`, `MINOR` and `PATCH` mean, and what a change to the harness requires — live in
 [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
+### 0.10.0 — 2026-09-26
+
+An opt-in lean workflow can be installed and measured without changing the standard task path.
+D-034. Use `--workflow=lean` to install `pilot/` and `scripts/harness-evidence.mjs`. Lean tasks
+close only with recorded passing baseline, task-specific, and final commands, observable behavior
+evidence, explicit human acceptance, and a coordination record if agents worked in parallel.
+`pilot/summarize.mjs` compares paired runs, leaving unavailable token and cost data missing.
+
 ### 0.9.0 — 2026-09-03
 
 The release history leaves the rules budget, and an installed harness can prove it is one.

@@ -68,6 +68,9 @@ if (existsSync(lockPath)) {
 if (!PROFILES.includes(cfg.profile)) {
   fail("harness.json", `profile must be one of ${PROFILES.join(" | ")}, got "${cfg.profile}"`);
 }
+if (cfg.workflow && !["standard", "lean"].includes(cfg.workflow)) {
+  fail("harness.json", `workflow must be standard or lean, got "${cfg.workflow}"`);
+}
 
 const decisionIds = new Set(decisions().map((d) => d.id));
 const journalIds = new Set(journal().map((e) => e.line.split("|")[1]?.trim()));
@@ -91,6 +94,12 @@ for (const task of tasks()) {
   }
   if (task.meta.profile && !PROFILES.includes(task.meta.profile)) {
     fail(where, `profile "${task.meta.profile}" is not one of ${PROFILES.join(" | ")}`);
+  }
+  if (task.meta.workflow && !["standard", "lean"].includes(task.meta.workflow)) {
+    fail(where, `workflow "${task.meta.workflow}" is not standard or lean`);
+  }
+  if (cfg.workflow === "lean" && task.meta.harness === cfg.harness && !task.meta.workflow) {
+    fail(where, "current-version task in a lean project needs `workflow: lean` (or explicit `standard` for a bootstrap task)");
   }
   if (task.meta.id && !task.name.startsWith(`${task.meta.id}-`)) {
     fail(where, `filename must start with the task id "${task.meta.id}-"`);
@@ -146,6 +155,54 @@ for (const task of tasks()) {
     if (!/^-\s*Task-specific:\s*\S/im.test(verification)) {
       fail(where, "status is done but `## Verification` names no task-specific check");
     }
+    if (task.meta.workflow === "lean") {
+      const agents = (section(task.text, "Agents") ?? []).join("\n");
+      const mode = agents.match(/^-\s*Mode:\s*(single|parallel)\s*$/im)?.[1];
+      if (!mode) fail(where, "lean closure needs `## Agents` with `- Mode: single|parallel`");
+      const fieldValue = (body, field) => body.match(new RegExp(`^-\\s*${field}:\\s*(.*)$`, "im"))?.[1]?.trim();
+      const filled = (value) => Boolean(value && !/^(pending|\.\.\.|path\b)/i.test(value));
+      if (mode === "parallel") {
+        for (const field of ["Ownership", "Integration", "Verifier"]) {
+          if (!filled(fieldValue(agents, field))) {
+            fail(where, `parallel lean task needs - ${field}: in ## Agents`);
+          }
+        }
+        if (/^self\b/i.test(fieldValue(agents, "Verifier") ?? "")) {
+          fail(where, "parallel lean task needs a verifier distinct from the implementers");
+        }
+      }
+      const outcome = (section(task.text, "Outcome") ?? []).join("\n");
+      for (const field of ["Behavior evidence", "Residual risk"]) {
+        if (!filled(fieldValue(outcome, field))) {
+          fail(where, `lean closure needs - ${field}: in ## Outcome`);
+        }
+      }
+      if (!/^-\s*Human decision:\s*accepted by\s+\S/im.test(outcome)) {
+        fail(where, "lean closure needs - Human decision: accepted by <person> in ## Outcome");
+      }
+      const evidencePath = join(ROOT, "docs/evidence", `${task.meta.id}.json`);
+      let records;
+      try {
+        records = JSON.parse(readFileSync(evidencePath, "utf8"));
+      } catch {
+        fail(where, `lean closure needs readable docs/evidence/${task.meta.id}.json from harness-evidence`);
+      }
+      if (records !== undefined) {
+        if (!Array.isArray(records)) {
+          fail(where, `docs/evidence/${task.meta.id}.json must be an array`);
+        } else {
+          for (const phase of ["baseline", "task-specific", "final"]) {
+            const record = records.filter((item) => item?.phase === phase).at(-1);
+            if (!record || record.exitCode !== 0 || !Array.isArray(record.command) || !record.command.length) {
+              fail(where, `lean closure needs a passing recorded ${phase} command`);
+            }
+          }
+          if (records.length && records.at(-1)?.phase !== "final") {
+            fail(where, "the last recorded check must be final; rerun it after any later check");
+          }
+        }
+      }
+    }
   }
 
   if (cfg.profile === "team") {
@@ -156,6 +213,10 @@ for (const task of tasks()) {
     const validation = section(task.text, "Validation") ?? [];
     if (task.meta.status === "done" && !/^-\s*Validated by:\s*\S/m.test(validation.join("\n"))) {
       fail(where, "team profile requires a `## Validation` section with a `- Validated by:` line");
+    }
+    if (task.meta.status === "done" && task.meta.workflow === "lean"
+        && /^-\s*Validated by:\s*pending\b/im.test(validation.join("\n"))) {
+      fail(where, "lean team validation still says pending; name the human validator");
     }
   }
 }

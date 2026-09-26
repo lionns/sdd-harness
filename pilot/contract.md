@@ -3,7 +3,8 @@ id: T-###
 title: Observable outcome in a few words
 status: ready
 profile: solo
-harness: 0.9.0
+harness: 0.10.0
+workflow: lean
 goal: What a user or another component should observe when this is complete.
 decisions: []
 ---
@@ -29,13 +30,20 @@ decisions: []
 - Final: configured project checks
 - Task-specific: command or observation that could fail only for this change
 
+## Agents
+
+- Mode: single
+- Verifier: self
+- Ownership: pending; for parallel work list separate paths or contracts
+- Integration: pending; for parallel work name the common check
+
 ## Outcome
 
 - Delivered: observable result and files changed
-- Evidence: consequential claim → exact file, test result, or direct observation
-- Checks: failures and final results; link to persistent evidence where practical
-- Residual risk: what remains unverified, or none
-- Human decision: accepted, changes requested, or pending
+- Behavior evidence: pending; link a result or describe a reproducible observation
+- Checks: `docs/evidence/T-###.json`; include failures and final results
+- Residual risk: pending; write the remaining risk or none
+- Human decision: pending; only the human changes this to `accepted by <name>`
 
 ## Trace
 
