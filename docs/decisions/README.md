@@ -41,3 +41,4 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-032](D-032-changelog-is-history-not-rules.md) | 2026-09-03 | The changelog is history, and the rules budget should not hold it | `accepted` | none |
 | [D-033](D-033-installed-harness-is-a-copy.md) | 2026-09-03 | An installed harness is a copy, and the linter can say so | `accepted` | none |
 | [D-034](D-034-evidence-first-workflow-trial.md) | 2026-09-26 | Trial evidence before adding workflow ceremony | `accepted` | none |
+| [D-035](D-035-lean-record-minimization.md) | 2026-09-26 | Minimize records in the lean experiment | `accepted` | none |

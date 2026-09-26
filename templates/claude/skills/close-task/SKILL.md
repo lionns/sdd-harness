@@ -1,12 +1,19 @@
 ---
 name: close-task
-description: Close an SDD harness task — final checks, acceptance criteria, outcome, trace, journal line, and regenerating STATUS.md. Use when a task in docs/tasks/ is finished, being marked done, or when asked to close, complete, or wrap up harness work.
+description: Close an SDD harness task under its active workflow — verify checks, criteria, outcome, acceptance, and generated status. Use when a task in docs/tasks/ is finished or being marked done.
 ---
 
 # Closing a task
 
 Normative rules are `docs/sdd/HARNESS.md` § Definition of Done and § Final Acceptance Gate. This is
 the running order, not a second copy of them.
+
+Read `harness.json` first. For `workflow: lean`, run baseline, task-specific, and final commands
+through `node scripts/harness-evidence.mjs`; fill behavior evidence and residual risk in Outcome.
+Leave the task in `review` until the human writes `accepted by <name>`. Then mark criteria and
+status done, regenerate STATUS, and run lint. No JOURNAL or trace is required in lean.
+
+For `workflow: standard`:
 
 1. Final checks green. The command is in `docs/project/quality-gates.md`. If they fail, the task is
    not done — it stays `doing`, `review`, or `blocked`. Never report done while a check fails.

@@ -18,6 +18,7 @@ const sample = (pairId, mode, overrides = {}) => ({
   agentCount: 1, independentVerifier: false, integrationEvidence: null, behaviorObserved: true,
   elapsedMinutes: mode === "current" ? 20 : 15,
   humanReviewMinutes: mode === "current" ? 8 : 5,
+  documentationMinutes: mode === "current" ? 7 : 3,
   coordinationMinutes: 0,
   inputTokens: mode === "current" ? 2000 : 1000,
   outputTokens: mode === "current" ? 1000 : 500,
@@ -45,6 +46,7 @@ test("compares only matched pairs and leaves missing token and cost values missi
   assert.deepEqual(report.metrics.elapsedMinutes, { pairedCount: 2, medianLeanMinusCurrent: -5 });
   assert.deepEqual(report.metrics.tokens, { pairedCount: 1, medianLeanMinusCurrent: -1500 });
   assert.deepEqual(report.metrics.costUsd, { pairedCount: 0, medianLeanMinusCurrent: null });
+  assert.deepEqual(report.metrics.documentationMinutes, { pairedCount: 2, medianLeanMinusCurrent: -4 });
   assert.deepEqual(report.observedBehavior, { current: 2, lean: 2 });
 });
 
@@ -75,7 +77,7 @@ test("the compact contract needs recorded checks and human acceptance before clo
     .replace(/^(- Residual risk:) .*$/m, "$1 none")
     .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner");
   const root = makeRepo({
-    config: { harness: "0.10.0", workflow: "lean" },
+    config: { harness: "0.11.0", workflow: "lean" },
     tasks: { "T-001-compact-pilot.md": filled },
     project: { "brief.md": "# Fixture brief\n" },
   });
@@ -95,7 +97,7 @@ test("parallel lean closure requires ownership, integration, and a separate veri
   const task = template.replace("T-###", "T-001").replace("status: ready", "status: done")
     .replaceAll("- [ ]", "- [x]").replace("- Mode: single", "- Mode: parallel")
     .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner");
-  const root = makeRepo({ config: { harness: "0.10.0", workflow: "lean" }, tasks: { "T-001-parallel.md": task } });
+  const root = makeRepo({ config: { harness: "0.11.0", workflow: "lean" }, tasks: { "T-001-parallel.md": task } });
   const report = lint(root).stderr;
   assert.match(report, /parallel lean task needs - Ownership/);
   assert.match(report, /parallel lean task needs - Integration/);

@@ -19,6 +19,25 @@ export function renderStatus(root = ROOT) {
   const undecided = decisions(root).filter((d) => d.status === "proposed");
 
   const out = [BANNER, "", `# Status — ${cfg.project}`, ""];
+  if (cfg.workflow === "lean") {
+    const ranked = ["doing", "review", "blocked", "ready"]
+      .flatMap((state) => open.filter((task) => task.meta?.status === state));
+    out.push(`Harness \`${cfg.harness}\` · \`${cfg.profile}\` · lean`, "", "## Next", "");
+    const next = ranked[0];
+    out.push(next ? `[${next.meta.id}](docs/tasks/${next.name}) · ${next.meta.status} · ${next.meta.goal}`
+      : "No active task.", "");
+    if (ranked.length > 1) {
+      out.push("## Other active tasks", "");
+      out.push(...ranked.slice(1).map((task) =>
+        `- [${task.meta.id}](docs/tasks/${task.name}) · ${task.meta.status} · ${task.meta.goal}`), "");
+    }
+    if (undecided.length) {
+      out.push("## Pending decisions", "", ...undecided.map((decision) =>
+        `- [${decision.id}](docs/decisions/${decision.name}) · ${decision.title}`), "");
+    }
+    out.push("Completed tasks: `docs/tasks/` · Decisions: `docs/decisions/README.md`");
+    return `${out.join("\n")}\n`;
+  }
   out.push(`Harness \`${cfg.harness}\` · profile \`${cfg.profile}\``, "");
 
   out.push("## Tasks", "");

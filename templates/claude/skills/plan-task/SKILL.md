@@ -6,7 +6,8 @@ description: Plan a new SDD harness task — sources, scope, testable acceptance
 # Planning a task
 
 Normative rules are `docs/sdd/HARNESS.md` § Definition of Ready and `TEMPLATES.md` § Task File.
-Copy the template from there rather than inventing a shape.
+Under `workflow: lean`, copy `pilot/contract.md` (or `contract-team.md`) instead. Otherwise copy
+the standard template from `TEMPLATES.md` rather than inventing a shape.
 
 - Read `STATUS.md` first for the next id and what is already in flight.
 - `docs/project/` is the authority for scope and behavior. Do not invent requirements inside an

@@ -28,7 +28,7 @@ try {
 
 const result = spawnSync(command, args, { cwd: ROOT, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
 const exitCode = result.status ?? 1;
-const outputTail = `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(-2000);
+const outputTail = exitCode === 0 ? "" : `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(-1000);
 records.push({ at: new Date().toISOString(), phase, command: [command, ...args], exitCode, outputTail });
 mkdirSync(join(ROOT, "docs/evidence"), { recursive: true });
 writeFileSync(path, `${JSON.stringify(records, null, 2)}\n`);

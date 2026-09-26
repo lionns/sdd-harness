@@ -12,6 +12,7 @@
   "behaviorObserved": false,
   "elapsedMinutes": 0,
   "humanReviewMinutes": 0,
+  "documentationMinutes": 0,
   "coordinationMinutes": 0,
   "inputTokens": null,
   "outputTokens": null,

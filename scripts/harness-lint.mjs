@@ -124,7 +124,7 @@ for (const task of tasks()) {
     fail(where, `record is ${recordLines} lines, record budget is ${budgets.taskRecordLines} — compress the record`);
   }
   const trace = section(task.text, "Trace");
-  if (cfg.profile === "solo" && trace === null && task.meta.status !== "ready") {
+  if (cfg.profile === "solo" && task.meta.workflow !== "lean" && trace === null && task.meta.status !== "ready") {
     fail(where, "solo profile requires an inline `## Trace` block once work has started");
   }
   if (trace && trace.length > budgets.traceBlockLines) {
@@ -139,7 +139,7 @@ for (const task of tasks()) {
 
   // Closure integrity: `done` is a claim the Definition of Done makes checkable (D-013).
   if (task.meta.status === "done") {
-    if (task.meta.id && !journalIds.has(task.meta.id)) {
+    if (task.meta.workflow !== "lean" && task.meta.id && !journalIds.has(task.meta.id)) {
       fail(where, `status is done but JOURNAL.md has no line for ${task.meta.id}`);
     }
     const unchecked = (section(task.text, "Acceptance Criteria") ?? []).filter((l) => /^\s*-\s*\[ \]/.test(l));
@@ -207,16 +207,13 @@ for (const task of tasks()) {
 
   if (cfg.profile === "team") {
     const own = traceFiles.filter((t) => TRACE_NAME.exec(t.name)?.[1] === task.meta.id);
-    if (task.meta.status !== "ready" && own.length === 0) {
+    if (task.meta.workflow !== "lean" && task.meta.status !== "ready" && own.length === 0) {
       fail(where, `team profile requires a trace file at docs/traces/<YYYY-MM-DD>_${task.meta.id}_<role>.md`);
     }
     const validation = section(task.text, "Validation") ?? [];
-    if (task.meta.status === "done" && !/^-\s*Validated by:\s*\S/m.test(validation.join("\n"))) {
+    if (task.meta.workflow !== "lean" && task.meta.status === "done"
+        && !/^-\s*Validated by:\s*\S/m.test(validation.join("\n"))) {
       fail(where, "team profile requires a `## Validation` section with a `- Validated by:` line");
-    }
-    if (task.meta.status === "done" && task.meta.workflow === "lean"
-        && /^-\s*Validated by:\s*pending\b/im.test(validation.join("\n"))) {
-      fail(where, "lean team validation still says pending; name the human validator");
     }
   }
 }

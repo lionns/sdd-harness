@@ -41,6 +41,6 @@ files to six and moved budgets from prose into an executable check.
 
 ## Success Measures
 
-- A session starts by reading one file, `STATUS.md`, and knows the whole state.
+- A session starts from `STATUS.md` and knows actionable work; completed records remain in tasks.
 - A record that exceeds its budget fails a check rather than accumulating silently.
 - The harness passes the gates it imposes on the projects that adopt it.

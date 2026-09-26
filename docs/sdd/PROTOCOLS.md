@@ -45,7 +45,8 @@ In `workflow: lean`, run configured baseline, task-specific, and final commands 
 its real exit code in `docs/evidence/<task>.json`, including failures. A passing record is necessary
 but does not prove the claimed behavior; give the reviewer a direct observation or reproducible
 artifact and disclose what remains unverified. Keep a task in `review` until the human accepts
-the behavior and any durable decision. Do not put secrets in command output.
+the behavior and any durable decision. Successful output is omitted; failed output is bounded.
+Do not put secrets in command output.
 
 Use one agent by default. Parallel implementers require separate file or interface ownership and
 isolated checkouts. Integrate in one checkout and run the common final check there. Give an
@@ -57,6 +58,7 @@ verifier. Count every agent and the human's attention in the pilot measurement.
 
 A trace is an operational record: enough evidence to explain and audit what happened, nothing more.
 It never replaces the task, the review, or a decision.
+It is required only for `standard`; lean tasks keep their outcome and check evidence instead.
 
 - **`solo`**: one `## Trace` block at the bottom of the task file. Append one dated sub-entry per
   working round. Max 25 lines total — when it fills up, compress the older rounds into one line.

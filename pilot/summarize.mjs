@@ -9,7 +9,7 @@ if (!file) {
 }
 
 const requiredText = ["pairId", "project", "taskId", "category", "mode", "agent", "model", "evidence"];
-const requiredNumber = ["elapsedMinutes", "humanReviewMinutes", "coordinationMinutes", "agentCount"];
+const requiredNumber = ["elapsedMinutes", "humanReviewMinutes", "documentationMinutes", "coordinationMinutes", "agentCount"];
 const optionalNumber = ["inputTokens", "outputTokens", "costUsd", "reworkMinutes7d", "escapedDefects7d"];
 const grouped = new Map();
 let count = 0;
@@ -91,7 +91,7 @@ for (const [index, line] of source.split(/\r?\n/).entries()) {
 
 const pairs = [];
 const unpaired = [];
-const metricNames = ["elapsedMinutes", "humanReviewMinutes", "coordinationMinutes", "tokens", "costUsd", "reworkMinutes7d", "escapedDefects7d"];
+const metricNames = ["elapsedMinutes", "humanReviewMinutes", "documentationMinutes", "coordinationMinutes", "tokens", "costUsd", "reworkMinutes7d", "escapedDefects7d"];
 const deltas = Object.fromEntries(metricNames.map((key) => [key, []]));
 const tokens = (run) => run.inputTokens == null || run.outputTokens == null
   ? null : run.inputTokens + run.outputTokens;
@@ -111,6 +111,7 @@ for (const [pairId, pair] of grouped) {
   const values = {
     elapsedMinutes: [current.elapsedMinutes, lean.elapsedMinutes],
     humanReviewMinutes: [current.humanReviewMinutes, lean.humanReviewMinutes],
+    documentationMinutes: [current.documentationMinutes, lean.documentationMinutes],
     coordinationMinutes: [current.coordinationMinutes, lean.coordinationMinutes],
     tokens: [tokens(current), tokens(lean)],
     costUsd: [current.costUsd, lean.costUsd],

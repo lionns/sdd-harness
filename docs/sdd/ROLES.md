@@ -14,7 +14,7 @@
 - Deleting, skipping, relaxing, or narrowing a check to reach green is a defect, not a fix. A check
   that is genuinely wrong is changed by a decision, never by an edit made to get past it.
 - Report blockers early, with evidence.
-- Record the trace required by the active profile.
+- Record the trace in `standard`; in `lean`, keep the outcome and executed-check evidence.
 
 ## Roles
 

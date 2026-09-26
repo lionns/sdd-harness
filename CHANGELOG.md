@@ -4,6 +4,14 @@ Every released version of the SDD harness, newest first. The rules that govern a
 `MAJOR`, `MINOR` and `PATCH` mean, and what a change to the harness requires — live in
 [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
+### 0.11.0 — 2026-09-26
+
+The opt-in lean workflow removes repeated records and reduces startup context. D-035.
+Fresh lean installs have a compact STATUS, no per-task JOURNAL or trace requirement, a short
+AGENTS.md, and a one-version release declaration. The task outcome and executed-check evidence
+remain the closure record. Successful checks omit output excerpts; failures retain a bounded tail.
+Paired measurements now include documentation time. Standard installs keep their existing records.
+
 ### 0.10.0 — 2026-09-26
 
 An opt-in lean workflow can be installed and measured without changing the standard task path.

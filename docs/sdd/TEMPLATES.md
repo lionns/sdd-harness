@@ -2,7 +2,8 @@
 
 For an installed `workflow: lean`, copy `pilot/contract.md` (or `contract-team.md`) instead of the standard task file
 below. Its `## Outcome` records only behavior evidence, checks, residual risk, and human decision;
-the diff and command records carry the rest. A decision file is still for a choice that constrains
+the diff and command records carry the rest. No journal or trace is needed for a lean task.
+A decision file is still for a choice that constrains
 future work, not an ordinary implementation preference.
 
 ## Task File
@@ -124,7 +125,7 @@ After creating one, add its row to `docs/decisions/README.md`.
 
 ## Journal Entry
 
-`JOURNAL.md`, append-only, newest last. Exactly one line, pipe-separated:
+`standard` only: `JOURNAL.md`, append-only, newest last. Exactly one line, pipe-separated:
 
 ```txt
 YYYY-MM-DD | T-### | done | short outcome | N files | checks result | D-###,D-###

@@ -2,7 +2,7 @@
 
 Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Version **0.10.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
+Version **0.11.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## The problem it solves
 
@@ -27,21 +27,24 @@ node scripts/harness-init.mjs ../my-app --project=my-app --hooks
 |---|---|
 | `--project=<name>` | required |
 | `--profile=solo\|team` | `solo` is three roles, an inline trace, implicit validation. `team` is seven roles, trace files, an explicit validation gate. Default `solo` |
-| `--workflow=standard\|lean` | `standard` is the current task flow. `lean` installs `pilot/`, recorded check evidence, explicit human acceptance, and agent coordination. Default `standard` |
+| `--workflow=standard\|lean` | `standard` is the current task flow. `lean` installs a compact status and task contract, recorded check evidence, explicit human acceptance, and agent coordination, without per-task journal or trace. Default `standard` |
 | `--hooks` | installs `.githooks/pre-push`, which refuses a push whose records are invalid. Git runs it for every agent, and for a human using none |
 | `--claude` | adds a Claude Code `Stop` hook and three skills, catching a bad record a turn earlier. Optional, holds no rules |
 | `--adopt` | the repository already has code — see below |
 | `--force` | overwrite; nothing is overwritten without it |
 
 You get `docs/sdd/`, blank specification templates in `docs/project/`, the two enforcement scripts,
-`harness.json`, `JOURNAL.md`, and an `AGENTS.md` telling the agent to read `STATUS.md` first. The
-result is lint-clean on arrival. Lean also installs its evidence script and `pilot/` guide.
+`harness.json`, and an `AGENTS.md` telling the agent to read `STATUS.md` first. Standard installs
+also get `JOURNAL.md`; lean installs get the evidence script and `pilot/` guide. Both start lint-clean.
 
 To test the four lean changes in a separate project, install with `--workflow=lean` and read
 [`pilot/README.md`](pilot/README.md). It gives a compact task contract, records executed checks,
 keeps the human's review on behavior and durable decisions, uses parallel agents only for
 independent work, and compares full task cost with `standard`. Tokens and human review time are
 entered from actual observations; the harness does not infer them.
+Lean installs use a short agent entry point and compact release declaration. The full changelog
+stays in this source repository. Completed tasks remain in `docs/tasks/`; lean STATUS shows active
+work and pending decisions only.
 Use a new test directory for the lean install. Do not use `--force` to turn an existing 0.9
 installation into a pilot: that flag can overwrite project-owned files.
 
@@ -76,7 +79,7 @@ passing trivially because nothing is configured yet.
 
 ## The loop
 
-Once the foundation exists, every task runs the same way.
+Once the foundation exists, every task follows these gates.
 
 1. **Read** `STATUS.md`, `harness.json`, and the task file. That is the whole context for most work.
 2. **Baseline gate.** Run the checks in `docs/project/quality-gates.md`. Red means the task is
@@ -84,8 +87,9 @@ Once the foundation exists, every task runs the same way.
 3. **Implement** only what the task scopes.
 4. **Final gate.** Same checks, green, plus a check specific to this change and at least one that
    exercises it against what already exists.
-5. **Close.** Fill `## Outcome`, record the trace, set `status: done`, append one line to
-   `JOURNAL.md`, run `node scripts/harness-status.mjs`.
+5. **Close.** Fill `## Outcome`, obtain the required human acceptance, set `status: done`, and
+   regenerate `STATUS.md`. In `standard`, also record the trace and append one journal line.
+   In `lean`, keep the executed-check file and observable behavior evidence.
 
 A task is a file with its state in the front-matter and nowhere else:
 
@@ -111,9 +115,9 @@ implements: [FR-3]
 
 - **Budgets** — task, trace, decision, journal, and total harness-doc lines. The numbers live in
   `harness.json`. Hitting one means split the task; raising one is a governance change.
-- **Closure** — a `done` task needs its journal line, no unchecked acceptance criterion, a
-  `## Sources` that is not empty, a task-specific check named in `## Verification`, and a `harness:`
-  version the changelog declares.
+- **Closure** — a `done` task needs no unchecked acceptance criterion, a nonempty `## Sources`,
+  a task-specific check in `## Verification`, and a declared `harness:` version. `standard` also
+  needs a journal line and trace; `lean` needs recorded checks, behavior evidence, and acceptance.
 - **Foundation** — no task past `ready` while a declared topic has no accepted decision.
 - **Traceability** — an `implements:` id that no `docs/project/*.json` declares. Ids no task
   implements are reported without failing: a backlog is not a defect.
@@ -134,13 +138,13 @@ npm test                          # this repo's own suite
 ```
 harness.json          version, profile, foundation topics, record budgets
 AGENTS.md             what the agent reads first; CLAUDE.md is a pointer to it
-STATUS.md             generated — every task, decision, and recent closure, one file
-JOURNAL.md            append-only, one line per closed task
+STATUS.md             generated — all work in standard; active work and pending decisions in lean
+JOURNAL.md            standard only — append-only, one line per closed task
 docs/sdd/             the harness: README (routing), HARNESS, ROLES, PROTOCOLS, TEMPLATES, VERSION
 docs/project/         your specifications — brief, requirements, architecture, quality gates
 docs/tasks/           one file per task
 docs/decisions/       one file per decision, immutable once accepted, generated index
-docs/traces/          team profile only; in solo the trace is inline in the task
+docs/traces/          standard team profile only; standard solo keeps the trace inline
 ```
 
 [`docs/sdd/README.md`](docs/sdd/README.md) is the routing index: it says which harness document to

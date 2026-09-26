@@ -16,6 +16,7 @@ and domain details belong in `docs/project/`.
 ## Profiles
 
 `harness.json` declares the active profile.
+The records listed below describe `standard`; `lean` uses the shorter closure described next.
 
 ### `solo`
 
@@ -39,13 +40,12 @@ a broken tree and cost no documentation.
 
 ## Opt-in lean workflow
 
-`profile` controls trace and human validation, not the number of agents. `workflow` controls the task contract. The default
-`standard` keeps the flow below. `lean` installs `pilot/` and an evidence command. Copy
-the matching `pilot/contract*.md` for a new task and follow `pilot/README.md`. A lean task cannot close without
-recorded passing commands for baseline, task-specific behavior, and final integration; a behavior
-reference, residual risk, and explicit human acceptance. Parallel work additionally names separate
-ownership, integration, and a verifier. The linter checks records and command exit codes, not the
-truth of a source or the quality of the behavior: the human inspects those directly.
+`profile` describes people and review responsibility, not agent count. `workflow` selects records.
+The default `standard` keeps the full flow below. `lean` uses `pilot/contract*.md`, a compact
+STATUS, and executed-check evidence. It needs no JOURNAL or trace per task. A lean task closes
+with passing baseline, task-specific and final commands, behavior evidence, residual risk, and
+explicit human acceptance. Parallel work names separate ownership, integration, and a verifier.
+The linter checks records and exit codes; the human inspects behavior and consequential sources.
 
 ## Inception
 
@@ -69,15 +69,15 @@ moment lands where reversal is expensive.
 
 1. Settle the foundation if this project has not, then define or update the project specifications
    the work depends on.
-2. Create a task file from `TEMPLATES.md` in `docs/tasks/`.
+2. Create a task file from `TEMPLATES.md` in `standard`, or `pilot/contract*.md` in `lean`.
 3. Confirm Definition of Ready.
 4. Run the baseline checks from `docs/project/quality-gates.md`. Proceed only if green.
 5. Implement only the approved scope.
 6. Run the final checks. Verify against the task acceptance criteria.
 7. Review using `PROTOCOLS.md` § Review.
-8. Record the trace — inline in `solo`, separate file in `team`.
+8. In `standard`, record the trace — inline in `solo`, separate file in `team`.
 9. Record any new decision as its own file in `docs/decisions/`.
-10. Validate (implicit in `solo`, explicit in `team`), set `status: done`, append the journal line.
+10. Validate, set `status: done`, and append the journal line in `standard` only.
 11. Regenerate `STATUS.md`.
 
 ## Task States
@@ -104,9 +104,9 @@ The state lives in the task file front-matter and nowhere else. `STATUS.md` is g
 - Validation is granted per the active profile.
 - No unrelated changes were introduced.
 - New decisions exist as files in `docs/decisions/` and are listed in its index.
-- The trace exists per the active profile.
+- The trace exists per the active profile in `standard`.
 - Follow-up work is listed separately, not hidden in the implementation.
-- The journal line is appended and `STATUS.md` is regenerated.
+- The journal line is appended in `standard`; `STATUS.md` is regenerated in both workflows.
 
 ## Baseline Gate
 
@@ -115,26 +115,29 @@ Before new implementation, run the configured checks.
 - All green → implementation may start.
 - Any failure → implementation must not start. The task moves to `blocked`, unless the task is
   specifically to fix that baseline.
-- The failure is recorded in the task's trace block.
+- Record the failure in the task trace in `standard` or the check evidence in `lean`.
 - Reprioritizing is a human call; approving unrelated implementation on a red baseline is not.
 
 ## Final Acceptance Gate
 
-`harness-lint` enforces the mechanical half of the Definition of Done: a `done` task must have a
-journal line for its id, no unchecked acceptance criterion, a `harness:` version that `VERSION.md`
-declares, and — under `team` — a trace file and a named validator (D-013).
+`harness-lint` enforces the mechanical half of the Definition of Done: a `done` task must have no
+unchecked criterion and a declared `harness:` version. In `standard`, it also needs a journal line,
+and under `team`, a trace file and named validator (D-013). In `lean`, it needs passing recorded
+commands, behavior evidence, residual risk, and named human acceptance.
 
 Two kinds of check must both be green: the ones an agent iterates against, and at least one that
 exercises the change together with what already exists. The first kind can be made to pass by
 narrowing it, which is why the second is required and why weakening either is a defect.
 
 A change cannot be accepted unless all configured checks pass, task-specific verification passes,
-blocking review findings are resolved, the trace is complete, and required decisions are recorded.
+blocking review findings are resolved, the standard trace is complete when required, and required
+decisions are recorded.
 If final checks fail the task stays `doing`, `review`, or `blocked` — never `done`.
 
 ## Human Validation Gate
 
-In `solo`, accepting the change is the validation — there is no separate ceremony.
+In `standard` `solo`, accepting the change is the validation — there is no separate ceremony.
+In `lean`, the task stays in `review` until the human accepts the outcome explicitly.
 
 In `team` it is an explicit gate. Validation must be **stated**: silence, absence of objection, or
 an agent review is not approval. The validator receives, in one message:
@@ -142,7 +145,7 @@ an agent review is not approval. The validator receives, in one message:
 - Task ID and title, and a summary of what changed.
 - Files changed.
 - Baseline result, final check result, review result.
-- Trace path, decisions recorded.
+- Trace path in `standard`, and decisions recorded.
 - Known risks and follow-up work.
 
 ## Exceptions

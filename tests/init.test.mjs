@@ -48,6 +48,10 @@ test("lean install records real checks and closes a task only after human accept
   const dir = target();
   assert.equal(init(dir, "--project=pilot-app", "--workflow=lean", "--adopt").code, 0);
   assert.equal(JSON.parse(readFileSync(join(dir, "harness.json"), "utf8")).workflow, "lean");
+  assert.equal(existsSync(join(dir, "JOURNAL.md")), false);
+  assert.ok(readFileSync(join(dir, "AGENTS.md"), "utf8").length
+    < readFileSync(new URL("../templates/AGENTS.md", import.meta.url), "utf8").length / 2);
+  assert.ok(readFileSync(join(dir, "CHANGELOG.md"), "utf8").split("\n").length < 10);
   assert.ok(existsSync(join(dir, "pilot/contract.md")) && existsSync(join(dir, "scripts/harness-evidence.mjs")));
   const lock = JSON.parse(readFileSync(join(dir, "harness.lock"), "utf8"));
   assert.ok(lock.files["pilot/contract.md"] && lock.files["scripts/harness-evidence.mjs"]);
@@ -59,17 +63,19 @@ test("lean install records real checks and closes a task only after human accept
     .replace(/^(- Residual risk:) .*$/m, "$1 none");
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task);
   const evidence = (...args) => run(join(dir, "scripts/harness-evidence.mjs"), args, dir);
-  const ok = [process.execPath, "-e", "process.exit(0)"];
+  const ok = [process.execPath, "-e", "process.stdout.write('ok')"];
   assert.equal(evidence("T-002", "baseline", "--", ...ok).code, 0);
-  assert.equal(evidence("T-002", "task-specific", "--", process.execPath, "-e", "process.exit(3)").code, 3);
+  assert.equal(evidence("T-002", "task-specific", "--", process.execPath, "-e",
+    "process.stdout.write('x'.repeat(1500)); process.exit(3)").code, 3);
   assert.equal(evidence("T-002", "task-specific", "--", ...ok).code, 0);
   assert.equal(evidence("T-002", "final", "--", ...ok).code, 0);
   const records = JSON.parse(readFileSync(join(dir, "docs/evidence/T-002.json"), "utf8"));
   assert.deepEqual(records.map((r) => r.exitCode), [0, 3, 0, 0]);
+  assert.equal(records[0].outputTail, "", "successful checks should not add output to agent context");
+  assert.equal(records[1].outputTail.length, 1000, "failed output should be bounded");
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
   assert.equal(inside(dir, "harness-lint.mjs").code, 0, "review is allowed while the human decides");
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task.replace("status: review", "status: done"));
-  appendFileSync(join(dir, "JOURNAL.md"), "2026-09-26 | T-002 | done | pilot behavior | 1 file | checks green | -\n");
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
   assert.match(inside(dir, "harness-lint.mjs").stderr, /Human decision: accepted by <person>/);
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task.replace("status: review", "status: done")
@@ -77,28 +83,63 @@ test("lean install records real checks and closes a task only after human accept
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
   const lint = inside(dir, "harness-lint.mjs");
   assert.equal(lint.code, 0, lint.stderr);
+  assert.doesNotMatch(readFileSync(join(dir, "STATUS.md"), "utf8"), /T-002/, "closed work leaves lean startup context");
 });
 
-test("lean team install accepts its team contract with a trace and named validator", () => {
+test("lean team install closes without a separate trace or journal", () => {
   const dir = target();
   assert.equal(init(dir, "--project=pilot-team", "--profile=team", "--workflow=lean", "--adopt").code, 0);
+  assert.equal(existsSync(join(dir, "JOURNAL.md")), false);
+  assert.equal(existsSync(join(dir, "docs/traces")), false);
   const task = readFileSync(join(dir, "pilot/contract-team.md"), "utf8")
     .replace("T-###", "T-002").replace("status: ready", "status: done")
     .replaceAll("- [ ]", "- [x]").replace("exact/path", "docs/project/brief.md")
     .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/evidence/T-002.json")
     .replace(/^(- Residual risk:) .*$/m, "$1 none")
-    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner")
-    .replace(/^(- Validated by:) .*$/m, "$1 owner");
+    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner");
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task);
-  writeFileSync(join(dir, "docs/traces/2026-09-26_T-002_implementer.md"),
-    "## Trace\n\n- 2026-09-26 — read: brief · did: pilot · checks: recorded\n");
-  appendFileSync(join(dir, "JOURNAL.md"), "2026-09-26 | T-002 | done | pilot behavior | 1 file | checks green | -\n");
   for (const phase of ["baseline", "task-specific", "final"]) {
     const check = run(join(dir, "scripts/harness-evidence.mjs"),
       ["T-002", phase, "--", process.execPath, "-e", "process.exit(0)"], dir);
     assert.equal(check.code, 0, check.stderr);
   }
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  const lint = inside(dir, "harness-lint.mjs");
+  assert.equal(lint.code, 0, lint.stderr);
+});
+
+test("lean brownfield foundation task can close without a journal", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=existing-app", "--workflow=lean", "--adopt").code, 0);
+  let seed = readFileSync(join(dir, "docs/tasks/T-001-record-the-foundation.md"), "utf8");
+  assert.match(seed, /workflow: lean/);
+  seed = seed.replace("status: ready", "status: done").replaceAll("- [ ]", "- [x]")
+    .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/decisions/D-001-tests.md")
+    .replace(/^(- Residual risk:) .*$/m, "$1 none")
+    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner");
+  writeFileSync(join(dir, "docs/tasks/T-001-record-the-foundation.md"), seed);
+  writeFileSync(join(dir, "docs/decisions/D-001-tests.md"),
+    "# D-001 — Existing tests\n\n- Status: accepted\n- Date: 2026-09-26\n- Supersedes: none\n- Tasks: T-001\n- Foundation: tests\n\n## Decision\n\nUse the existing Node tests.\n");
+  const cfg = JSON.parse(readFileSync(join(dir, "harness.json"), "utf8"));
+  cfg.foundation = ["tests"];
+  writeFileSync(join(dir, "harness.json"), `${JSON.stringify(cfg, null, 2)}\n`);
+  for (const phase of ["baseline", "task-specific", "final"]) {
+    assert.equal(run(join(dir, "scripts/harness-evidence.mjs"),
+      ["T-001", phase, "--", process.execPath, "-e", "process.exit(0)"], dir).code, 0);
+  }
+  assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  const lint = inside(dir, "harness-lint.mjs");
+  assert.equal(lint.code, 0, lint.stderr);
+});
+
+test("optional Claude instructions follow the installed lean workflow", () => {
+  const dir = target();
+  assert.equal(init(dir, "--project=pilot-claude", "--workflow=lean", "--claude").code, 0);
+  const close = readFileSync(join(dir, ".claude/skills/close-task/SKILL.md"), "utf8");
+  const plan = readFileSync(join(dir, ".claude/skills/plan-task/SKILL.md"), "utf8");
+  assert.match(close, /No JOURNAL or trace is required in lean/);
+  assert.match(close, /accepted by <name>/);
+  assert.match(plan, /workflow: lean.*pilot\/contract\.md/);
   const lint = inside(dir, "harness-lint.mjs");
   assert.equal(lint.code, 0, lint.stderr);
 });

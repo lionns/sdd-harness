@@ -18,7 +18,7 @@ decisions: [D-034]
 
 - Run matched pairs from more than one adopting project, with the same agent and model per pair.
 - Inspect delivered behavior independently of the agent's closure note.
-- Record elapsed time, tokens when available, human review, coordination, acceptance, and later
+- Record elapsed time, documentation time, tokens when available, human review, coordination, acceptance, and later
   rework and escaped defects. Publish only approved aggregates.
 - Decide whether the measured benefit warrants promoting lean beyond opt-in.
 

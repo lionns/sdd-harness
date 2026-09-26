@@ -22,22 +22,21 @@ review time without increasing defects or rework?
    `docs/tasks/T-###-slug.md`, replace its placeholders,
    and confirm the observable goal and expensive-to-reverse choices with the human. Use `standard`
    and the normal task template for the comparison. Read the named source directly.
-   Under `team`, also write the profile's trace file in `docs/traces/` and name the human validator.
 3. Before implementing, run the configured baseline through the evidence command, for example
    `node scripts/harness-evidence.mjs T-101 baseline -- npm test`. A failed result is recorded;
    fix a red baseline or block the task. Then implement within the task scope.
 4. Run an observable task-specific command through the same tool using `task-specific`. For a UI
    or other manual check, record a path to a screenshot, session, or reproducible observation in
    `Behavior evidence`; a manual observation does not replace the recorded command. Run the project
-   check through `final` after integration. Avoid commands whose output contains secrets: the last
-   2,000 characters are stored in `docs/evidence/<task>.json`.
+   check through `final` after integration. Avoid commands whose output contains secrets: successful
+   output is omitted, and the last 1,000 characters of a failed check are stored in evidence.
 5. Show the human the behavior, diff, decision candidates, failed checks, and residual risk. Leave
    the task in `review` until the human accepts. Then fill `Human decision: accepted by <name>`,
-   mark criteria, append the journal line, regenerate `STATUS.md`, and run
-   `node scripts/harness-lint.mjs`. The
+   mark criteria, regenerate `STATUS.md`, and run `node scripts/harness-lint.mjs`. The
    reviewer focuses on behavior and material decisions rather than reading every narrative line.
 6. Enter one JSON object in a private JSONL file using `pilot/run.example.json` as the shape. Record
-   actual usage supplied by the agent provider. Include every agent and coordination time; link
+   actual usage supplied by the agent provider. Measure documentation time too. Include every agent
+   and coordination time; link
    the integration evidence for multi-agent runs. Leave unavailable token and cost fields null.
    Seven days later, fill the rework and escaped-defect fields. Do not invent missing measurements.
 
@@ -53,7 +52,7 @@ elapsed time, conflict repair, and human follow-up in the run.
 ## Read the result
 
 `node pilot/summarize.mjs path/to/runs.jsonl` reports each valid matched pair
-and medians for elapsed and human review time. Token and dollar comparisons appear only for pairs
+and medians for elapsed, documentation, and human review time. Token and dollar comparisons appear only for pairs
 with both measurements. Acceptance, rework, and escaped defects remain visible beside cost.
 The summary is descriptive; it does not prove a causal gain from a small pilot.
 

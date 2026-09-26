@@ -44,18 +44,18 @@ export function plan({ project, profile, workflow = "standard", adopt = false, r
   harness.foundation = adopt ? [] : FOUNDATION_TOPICS;
   const files = [
     ["harness.json", `${JSON.stringify(harness, null, 2)}\n`],
-    ["AGENTS.md", readFileSync(join(root, "templates/AGENTS.md"), "utf8")],
+    ["AGENTS.md", readFileSync(join(root, workflow === "lean" ? "templates/AGENTS-lean.md" : "templates/AGENTS.md"), "utf8")],
     ["CLAUDE.md", readFileSync(join(root, "templates/CLAUDE.md"), "utf8")],
-    ["JOURNAL.md", readFileSync(join(root, "templates/JOURNAL.md"), "utf8")],
-    // The changelog is how an adopter reads why its version changed, so it installs with the rules
-    // that point at it (D-032).
-    ["CHANGELOG.md", readFileSync(join(root, "CHANGELOG.md"), "utf8")],
+    ...(workflow === "lean" ? [] : [["JOURNAL.md", readFileSync(join(root, "templates/JOURNAL.md"), "utf8")]]),
+    ["CHANGELOG.md", workflow === "lean"
+      ? `# Installed harness\n\n### ${version} — lean pilot\n\nRelease history: source repository.\n`
+      : readFileSync(join(root, "CHANGELOG.md"), "utf8")],
   ];
   if (adopt) {
-    const seed = readFileSync(join(root, "templates/T-001-record-the-foundation.md"), "utf8");
-    const bootstrap = seed.replace("__HARNESS__", version);
-    files.push(["docs/tasks/T-001-record-the-foundation.md",
-      workflow === "lean" ? bootstrap.replace(/^harness: .*$/m, `harness: ${version}\nworkflow: standard`) : bootstrap]);
+    const source = workflow === "lean" ? "pilot/foundation.md" : "templates/T-001-record-the-foundation.md";
+    const seed = readFileSync(join(root, source), "utf8")
+      .replace("__HARNESS__", version).replace("__PROFILE__", profile);
+    files.push(["docs/tasks/T-001-record-the-foundation.md", seed]);
   }
   return files;
 }
@@ -89,7 +89,7 @@ function install({ target, project, profile, workflow = "standard", adopt = fals
   for (const script of scripts) cpSync(join(ROOT, "scripts", script), join(target, "scripts", script));
 
   // Before the files: the brownfield seed task lands inside `docs/tasks/`, which does not exist yet.
-  const empty = ["docs/tasks", "docs/decisions", ...(profile === "team" ? ["docs/traces"] : [])];
+  const empty = ["docs/tasks", "docs/decisions", ...(profile === "team" && workflow !== "lean" ? ["docs/traces"] : [])];
   for (const dir of empty) {
     mkdirSync(join(target, dir), { recursive: true });
     writeFileSync(join(target, dir, ".gitkeep"), "");

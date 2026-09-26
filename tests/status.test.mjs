@@ -58,6 +58,21 @@ test("the journal shows the last five entries, newest first", () => {
   assert.deepEqual(shown, ["2026-08-26", "2026-08-25", "2026-08-24", "2026-08-23", "2026-08-22"]);
 });
 
+test("lean status keeps actionable work and pending decisions without loading history", () => {
+  const out = renderStatus(makeRepo({
+    config: { workflow: "lean", harness: "0.11.0" },
+    tasks: {
+      "T-001-done.md": task({ id: "T-001", status: "done" }),
+      "T-002-ready.md": task({ id: "T-002", status: "ready" }),
+    },
+    decisions: { "D-001-open.md": decision({ id: "D-001", state: "proposed" }) },
+  }));
+  assert.match(out, /\[T-002\].*ready/);
+  assert.match(out, /\[D-001\]/);
+  assert.doesNotMatch(out, /T-001|Journal|outcome 0/);
+  assert.ok(out.split("\n").length < 20, "one active task should fit in a short startup index");
+});
+
 test("the decision index strips the ID prefix from titles and marks an empty set", () => {
   assert.match(renderDecisionIndex(makeRepo()), /\| — \| — \| No decisions recorded yet \| — \| — \|/);
 

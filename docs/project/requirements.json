@@ -65,6 +65,21 @@
       "id": "FR-10",
       "statement": "Installing lean is one command and does not change the default standard workflow.",
       "sources": ["D-034", "scripts/harness-init.mjs"]
+    },
+    {
+      "id": "FR-11",
+      "statement": "Lean startup context lists active work and pending decisions without completed-task or journal history.",
+      "sources": ["D-035", "scripts/harness-status.mjs"]
+    },
+    {
+      "id": "FR-12",
+      "statement": "Lean tasks close from the task outcome and executed-check evidence without a journal or trace; standard tasks keep those existing records.",
+      "sources": ["D-035", "scripts/harness-lint.mjs"]
+    },
+    {
+      "id": "FR-13",
+      "statement": "The pilot measures documentation time and provider-reported tokens alongside quality and human review.",
+      "sources": ["D-035", "pilot/summarize.mjs"]
     }
   ],
   "nonFunctional": [
