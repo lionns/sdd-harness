@@ -1,0 +1,18 @@
+{
+  "pairId": "pilot-01",
+  "project": "example-project",
+  "taskId": "T-101",
+  "category": "bugfix",
+  "mode": "lean",
+  "agent": "example-agent",
+  "model": "example-model",
+  "elapsedMinutes": 0,
+  "humanReviewMinutes": 0,
+  "inputTokens": null,
+  "outputTokens": null,
+  "costUsd": null,
+  "accepted": false,
+  "reworkMinutes7d": null,
+  "escapedDefects7d": null,
+  "evidence": "path-or-link"
+}

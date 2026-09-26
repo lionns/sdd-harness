@@ -32,7 +32,7 @@ files to six and moved budgets from prose into an executable check.
 ## Constraints
 
 - Zero runtime dependencies. Node >= 24, built-ins only.
-- `docs/sdd/` stays under its own 600-line budget; consolidation beats addition.
+- `docs/sdd/` stays under the budget declared in `harness.json`; consolidation beats addition.
 - Changes to `docs/sdd/`, `harness.json`, or `scripts/` are governance changes: explicit human
   approval, a decision file, and a `VERSION.md` entry when behavior changes.
 - `STATUS.md` and `docs/decisions/README.md` are generated. Never hand-edited.

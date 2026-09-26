@@ -25,7 +25,7 @@ If those three answer the question, stop reading. `docs/sdd/README.md` is the ro
 ## Repo-specific
 
 - Zero runtime dependencies. Node >= 24, built-ins only. Nothing enters `package.json`.
-- `docs/sdd/` has a hard 600-line budget. Consolidate rather than add.
+- `docs/sdd/` has the hard line budget declared in `harness.json`. Consolidate rather than add.
 - New behavior in `scripts/` ships with a test in `tests/`.
 - `templates/` is what adopters copy — never put this repo's own content there (D-012).
 - `docs/project/` is this repo's own filled specification, not a template.

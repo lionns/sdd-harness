@@ -8,6 +8,7 @@ Harness `0.9.0` · profile `solo`
 
 | Task | State | Goal |
 |---|---|---|
+| [T-023](docs/tasks/T-023-lean-workflow-experiment.md) | `doing` | Test whether a smaller task contract and evidence-led closure reduce agent cost and human review time without lowering delivered quality. |
 | [T-001](docs/tasks/T-001-harness-self-baseline.md) | `done` | Give this repo the green baseline it demands of every project it is copied into — real quality gates and an automated test suite for the two scripts that enforce the harness. |
 | [T-002](docs/tasks/T-002-script-path-resolution.md) | `done` | Make the two scripts work when the repo path contains a symlink or a space, and stop the docs/sdd line count from disagreeing with the linter's own. |
 | [T-003](docs/tasks/T-003-adoption-templates.md) | `done` | Give adopters a pristine `templates/` tree to copy — including the `CLAUDE.md` entry point the harness needs to take effect — and let `docs/project/` hold this repo's real specifications instead of a mix of both. |
@@ -33,11 +34,11 @@ Harness `0.9.0` · profile `solo`
 
 ## Next
 
-Nothing open. Plan the next task before implementing anything.
+**T-023** (`doing`) — Test whether a smaller task contract and evidence-led closure reduce agent cost and human review time without lowering delivered quality.
 
 ## Open decisions
 
-None. All decisions are accepted or superseded.
+- D-034 — Trial evidence before adding workflow ceremony — `proposed`, needs human approval
 
 ## Journal — last 5
 
