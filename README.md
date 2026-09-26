@@ -2,7 +2,7 @@
 
 Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Version **0.11.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
+Version **0.12.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## The problem it solves
 
@@ -26,8 +26,8 @@ node scripts/harness-init.mjs ../my-app --project=my-app --hooks
 | Flag | Effect |
 |---|---|
 | `--project=<name>` | required |
-| `--profile=solo\|team` | `solo` is three roles, an inline trace, implicit validation. `team` is seven roles, trace files, an explicit validation gate. Default `solo` |
-| `--workflow=standard\|lean` | `standard` is the current task flow. `lean` installs a compact status and task contract, recorded check evidence, explicit human acceptance, and agent coordination, without per-task journal or trace. Default `standard` |
+| `--profile=solo\|team` | In `standard`, `solo` is three roles with an inline trace; `team` has seven responsibilities and separate traces. In `lean`, agent count follows the task. Default `solo` |
+| `--workflow=standard\|lean` | `standard` is the current task flow. `lean` installs compact status and tasks, recorded checks, resource assessment, and risk-based human acceptance, without per-task journal or trace. Default `standard` |
 | `--hooks` | installs `.githooks/pre-push`, which refuses a push whose records are invalid. Git runs it for every agent, and for a human using none |
 | `--claude` | adds a Claude Code `Stop` hook and three skills, catching a bad record a turn earlier. Optional, holds no rules |
 | `--adopt` | the repository already has code — see below |
@@ -39,9 +39,14 @@ also get `JOURNAL.md`; lean installs get the evidence script and `pilot/` guide.
 
 To test the four lean changes in a separate project, install with `--workflow=lean` and read
 [`pilot/README.md`](pilot/README.md). It gives a compact task contract, records executed checks,
-keeps the human's review on behavior and durable decisions, uses parallel agents only for
+keeps the human's review on product behavior and consequential decisions, uses parallel agents only for
 independent work, and compares full task cost with `standard`. Tokens and human review time are
 entered from actual observations; the harness does not infer them.
+In 0.12, routine lean tasks close on technical evidence. Product work needs a usable preview and
+human acceptance; consequential choices need independent verification and human acceptance.
+Resource-affecting paths record comparable before/after checks. Stack and deployment proposals
+start from the human's operating constraints; production protection also belongs in the hosting
+system because a Markdown record cannot authenticate an approval or block a direct deploy command.
 Lean installs use a short agent entry point and compact release declaration. The full changelog
 stays in this source repository. Completed tasks remain in `docs/tasks/`; lean STATUS shows active
 work and pending decisions only.
@@ -87,7 +92,7 @@ Once the foundation exists, every task follows these gates.
 3. **Implement** only what the task scopes.
 4. **Final gate.** Same checks, green, plus a check specific to this change and at least one that
    exercises it against what already exists.
-5. **Close.** Fill `## Outcome`, obtain the required human acceptance, set `status: done`, and
+5. **Close.** Fill `## Outcome`, obtain human acceptance when the task requires it, set `status: done`, and
    regenerate `STATUS.md`. In `standard`, also record the trace and append one journal line.
    In `lean`, keep the executed-check file and observable behavior evidence.
 
@@ -107,7 +112,7 @@ implements: [FR-3]
 ```
 
 `STATUS.md` and `docs/decisions/README.md` are generated from those files. Never edit them by hand;
-`harness-lint` regenerates them and fails if what is on disk differs.
+`harness-status` regenerates them; `harness-lint` fails if what is on disk differs.
 
 ## What the linter enforces
 
@@ -117,7 +122,8 @@ implements: [FR-3]
   `harness.json`. Hitting one means split the task; raising one is a governance change.
 - **Closure** — a `done` task needs no unchecked acceptance criterion, a nonempty `## Sources`,
   a task-specific check in `## Verification`, and a declared `harness:` version. `standard` also
-  needs a journal line and trace; `lean` needs recorded checks, behavior evidence, and acceptance.
+  needs a journal line and trace; `lean` needs recorded checks, behavior evidence, resource
+  classification, and human acceptance only for product or consequential work since 0.12.
 - **Foundation** — no task past `ready` while a declared topic has no accepted decision.
 - **Traceability** — an `implements:` id that no `docs/project/*.json` declares. Ids no task
   implements are reported without failing: a backlog is not a defect.

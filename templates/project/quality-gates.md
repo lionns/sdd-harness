@@ -43,6 +43,16 @@ pass a check that runs it together with what already exists.
 
 <!-- solo: accepting the change is the validation. team: name the validator and what they receive. -->
 
+## Resource Checks
+
+<!-- Name a repeatable command and budget for each critical runtime journey. Affected lean tasks
+run the same measurement before and after; routine tasks with no runtime impact say why. -->
+
+## Production Release Controls
+
+<!-- Point to the human-approved deploy decision, preview, provider-side protection, monitoring,
+and rollback. First or high-risk releases pause for live approval before execution. -->
+
 ## Known Exceptions
 
 <!-- A skipped check, why, who approved it, and its expiry or follow-up task. Or "None outstanding." -->

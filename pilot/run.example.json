@@ -20,5 +20,6 @@
   "accepted": false,
   "reworkMinutes7d": null,
   "escapedDefects7d": null,
+  "resourceRegression7d": null,
   "evidence": "path-or-link"
 }

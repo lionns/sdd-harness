@@ -25,6 +25,8 @@ files to six and moved budgets from prose into an executable check.
 - Keeping the harness honest about itself: its own gates, tests, and records.
 - An opt-in lean workflow that shortens task records, grounds closure in executed checks and
   observable behavior, coordinates independent agents, and measures total task cost.
+- Risk-based product validation: agents own technical checks and resource evidence; people test
+  usable previews and approve consequential architecture and production choices.
 
 ### Out of Scope
 

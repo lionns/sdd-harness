@@ -44,21 +44,23 @@ test("an installed harness passes its own status and lint gates", () => {
   assert.match(lint.stdout, /harness-lint: clean \(0 tasks, 0 decisions/);
 });
 
-test("lean install records real checks and closes a task only after human acceptance", () => {
+test("lean install records real checks and lets routine technical work close without human review", () => {
   const dir = target();
   assert.equal(init(dir, "--project=pilot-app", "--workflow=lean", "--adopt").code, 0);
   assert.equal(JSON.parse(readFileSync(join(dir, "harness.json"), "utf8")).workflow, "lean");
   assert.equal(existsSync(join(dir, "JOURNAL.md")), false);
   assert.ok(readFileSync(join(dir, "AGENTS.md"), "utf8").length
-    < readFileSync(new URL("../templates/AGENTS.md", import.meta.url), "utf8").length / 2);
+    < readFileSync(new URL("../templates/AGENTS.md", import.meta.url), "utf8").length * 0.7);
   assert.ok(readFileSync(join(dir, "CHANGELOG.md"), "utf8").split("\n").length < 10);
   assert.ok(existsSync(join(dir, "pilot/contract.md")) && existsSync(join(dir, "scripts/harness-evidence.mjs")));
   const lock = JSON.parse(readFileSync(join(dir, "harness.lock"), "utf8"));
   assert.ok(lock.files["pilot/contract.md"] && lock.files["scripts/harness-evidence.mjs"]);
   const task = readFileSync(join(dir, "pilot/contract.md"), "utf8")
     .replace("T-###", "T-002").replace("status: ready", "status: review")
+    .replace("validation: pending", "validation: routine")
     .replaceAll("- [ ]", "- [x]")
     .replace("exact/path", "docs/project/brief.md")
+    .replace("Resource impact: pending", "Resource impact: none — no runtime path")
     .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/evidence/T-002.json and observed output")
     .replace(/^(- Residual risk:) .*$/m, "$1 none");
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task);
@@ -74,12 +76,8 @@ test("lean install records real checks and closes a task only after human accept
   assert.equal(records[0].outputTail, "", "successful checks should not add output to agent context");
   assert.equal(records[1].outputTail.length, 1000, "failed output should be bounded");
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
-  assert.equal(inside(dir, "harness-lint.mjs").code, 0, "review is allowed while the human decides");
+  assert.equal(inside(dir, "harness-lint.mjs").code, 0, "review is allowed while technical checks finish");
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task.replace("status: review", "status: done"));
-  assert.equal(inside(dir, "harness-status.mjs").code, 0);
-  assert.match(inside(dir, "harness-lint.mjs").stderr, /Human decision: accepted by <person>/);
-  writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task.replace("status: review", "status: done")
-    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner"));
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
   const lint = inside(dir, "harness-lint.mjs");
   assert.equal(lint.code, 0, lint.stderr);
@@ -93,10 +91,11 @@ test("lean team install closes without a separate trace or journal", () => {
   assert.equal(existsSync(join(dir, "docs/traces")), false);
   const task = readFileSync(join(dir, "pilot/contract-team.md"), "utf8")
     .replace("T-###", "T-002").replace("status: ready", "status: done")
+    .replace("validation: pending", "validation: routine")
     .replaceAll("- [ ]", "- [x]").replace("exact/path", "docs/project/brief.md")
+    .replace("Resource impact: pending", "Resource impact: none — no runtime path")
     .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/evidence/T-002.json")
-    .replace(/^(- Residual risk:) .*$/m, "$1 none")
-    .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner");
+    .replace(/^(- Residual risk:) .*$/m, "$1 none");
   writeFileSync(join(dir, "docs/tasks/T-002-pilot.md"), task);
   for (const phase of ["baseline", "task-specific", "final"]) {
     const check = run(join(dir, "scripts/harness-evidence.mjs"),
@@ -115,6 +114,8 @@ test("lean brownfield foundation task can close without a journal", () => {
   assert.match(seed, /workflow: lean/);
   seed = seed.replace("status: ready", "status: done").replaceAll("- [ ]", "- [x]")
     .replace(/^(- Behavior evidence:) .*$/m, "$1 docs/decisions/D-001-tests.md")
+    .replace(/^(- Verifier:) .*$/m, "$1 independent reviewer")
+    .replace(/^(- Review evidence:) .*$/m, "$1 independent review of cited tests")
     .replace(/^(- Residual risk:) .*$/m, "$1 none")
     .replace(/^(- Human decision:) .*$/m, "$1 accepted by owner");
   writeFileSync(join(dir, "docs/tasks/T-001-record-the-foundation.md"), seed);
@@ -128,6 +129,11 @@ test("lean brownfield foundation task can close without a journal", () => {
       ["T-001", phase, "--", process.execPath, "-e", "process.exit(0)"], dir).code, 0);
   }
   assert.equal(inside(dir, "harness-status.mjs").code, 0);
+  assert.match(inside(dir, "harness-lint.mjs").stderr, /Human choice: accepted by <person>/);
+  writeFileSync(join(dir, "docs/decisions/D-001-tests.md"),
+    readFileSync(join(dir, "docs/decisions/D-001-tests.md"), "utf8")
+      .replace("- Foundation: tests", "- Foundation: tests\n- Human choice: accepted by owner; evidence: pilot approval"));
+  assert.equal(inside(dir, "harness-status.mjs").code, 0);
   const lint = inside(dir, "harness-lint.mjs");
   assert.equal(lint.code, 0, lint.stderr);
 });
@@ -138,7 +144,7 @@ test("optional Claude instructions follow the installed lean workflow", () => {
   const close = readFileSync(join(dir, ".claude/skills/close-task/SKILL.md"), "utf8");
   const plan = readFileSync(join(dir, ".claude/skills/plan-task/SKILL.md"), "utf8");
   assert.match(close, /No JOURNAL or trace is required in lean/);
-  assert.match(close, /accepted by <name>/);
+  assert.match(close, /human gate only for product or consequential tasks/);
   assert.match(plan, /workflow: lean.*pilot\/contract\.md/);
   const lint = inside(dir, "harness-lint.mjs");
   assert.equal(lint.code, 0, lint.stderr);

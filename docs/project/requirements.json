@@ -48,7 +48,7 @@
     },
     {
       "id": "FR-7",
-      "statement": "An opt-in lean task uses a compact contract and closes only with executed check records, observable behavior evidence, residual risk, and explicit human acceptance.",
+      "statement": "An opt-in lean task uses a compact contract and closes with executed check records, observable behavior evidence, residual risk, and the acceptance its task version requires.",
       "sources": ["D-034", "pilot/contract.md"]
     },
     {
@@ -58,7 +58,7 @@
     },
     {
       "id": "FR-9",
-      "statement": "The pilot compares paired standard and lean runs across elapsed time, tokens, cost, human review, acceptance, rework, and escaped defects without inventing missing telemetry.",
+      "statement": "The pilot compares paired standard and lean runs across elapsed time, tokens, cost, human review, acceptance, rework, escaped defects, and resource regressions without inventing missing telemetry.",
       "sources": ["D-034", "pilot/summarize.mjs"]
     },
     {
@@ -80,6 +80,26 @@
       "id": "FR-13",
       "statement": "The pilot measures documentation time and provider-reported tokens alongside quality and human review.",
       "sources": ["D-035", "pilot/summarize.mjs"]
+    },
+    {
+      "id": "FR-14",
+      "statement": "Current lean tasks distinguish routine technical closure from product and consequential human acceptance; consequential closure includes independent technical verification.",
+      "sources": ["D-036", "pilot/contract.md"]
+    },
+    {
+      "id": "FR-15",
+      "statement": "A lean task assesses resource impact before work and records measured before/after checks for cost-bearing paths.",
+      "sources": ["D-036", "scripts/harness-evidence.mjs"]
+    },
+    {
+      "id": "FR-16",
+      "statement": "New lean foundation choices record human acceptance, and deployment choices include a production release policy.",
+      "sources": ["D-036", "scripts/harness-lint.mjs"]
+    },
+    {
+      "id": "FR-17",
+      "statement": "Agents present usable product previews and concise choice summaries while routine implementation records remain agent-owned.",
+      "sources": ["D-036", "pilot/README.md"]
     }
   ],
   "nonFunctional": [

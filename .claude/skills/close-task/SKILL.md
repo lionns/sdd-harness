@@ -10,8 +10,10 @@ the running order, not a second copy of them.
 
 Read `harness.json` first. For `workflow: lean`, run baseline, task-specific, and final commands
 through `node scripts/harness-evidence.mjs`; fill behavior evidence and residual risk in Outcome.
-Leave the task in `review` until the human writes `accepted by <name>`. Then mark criteria and
-status done, regenerate STATUS, and run lint. No JOURNAL or trace is required in lean.
+Since 0.12, classify validation and resource impact before work, measure affected paths before
+and after, and use the human gate only for product or consequential tasks. Earlier lean tasks keep
+per-task human acceptance. Then mark criteria and status done, regenerate STATUS, and run lint.
+No JOURNAL or trace is required in lean.
 
 For `workflow: standard`:
 

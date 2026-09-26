@@ -5,6 +5,7 @@ status: ready
 profile: __PROFILE__
 harness: __HARNESS__
 workflow: lean
+validation: consequential
 goal: Record the architecture this codebase already implements and configure real quality gates.
 decisions: []
 ---
@@ -20,10 +21,12 @@ decisions: []
 - Configure `docs/project/quality-gates.md` from the existing test strategy.
 - Set `harness.json` foundation to exactly the settled topics.
 - Preserve existing behavior; defer an unknown topic with an accepted decision and trigger.
+- Resource impact: none — this task records current choices without changing runtime behavior.
 
 ## Acceptance Criteria
 
 - [ ] Every declared foundation topic has one accepted decision supported by code.
+- [ ] The human confirms consequential choices; deployment has an approved release policy.
 - [ ] Quality gates run real project checks and the harness linter is green.
 
 ## Verification
@@ -41,5 +44,6 @@ decisions: []
 
 - Behavior evidence: pending; cite decisions and paths inspected
 - Checks: `docs/evidence/T-001.json`
+- Review evidence: pending; independent verifier checks claims against code
 - Residual risk: pending
-- Human decision: pending; only the human writes `accepted by <name>`
+- Human decision: pending; record acceptance only after the human replies

@@ -43,9 +43,11 @@ a broken tree and cost no documentation.
 `profile` describes people and review responsibility, not agent count. `workflow` selects records.
 The default `standard` keeps the full flow below. `lean` uses `pilot/contract*.md`, a compact
 STATUS, and executed-check evidence. It needs no JOURNAL or trace per task. A lean task closes
-with passing baseline, task-specific and final commands, behavior evidence, residual risk, and
-explicit human acceptance. Parallel work names separate ownership, integration, and a verifier.
-The linter checks records and exit codes; the human inspects behavior and consequential sources.
+with passing baseline, task-specific and final commands, behavior evidence, and residual risk.
+Since 0.12, routine work closes on technical evidence; product work needs a usable preview and
+human acceptance; consequential work also needs an independent verifier. Older lean tasks keep
+their per-task human gate. Parallel work names ownership, integration, and a verifier.
+The linter checks record shape and exit codes; a human tests product behavior and chooses tradeoffs.
 
 ## Inception
 
@@ -64,6 +66,10 @@ Nothing outside the list is settled up front — everything else is decided per 
 which is what keeps inception from becoming a specification phase. `harness-lint` fails while any
 task is past `ready` and a listed topic is unsettled, and only `accepted` counts, so the approval
 moment lands where reversal is expensive.
+New lean projects record `Human choice: accepted by <person>; evidence: <reply reference>` on each
+accepted foundation decision. Deployment also names a manual or guarded automatic release policy;
+guarded automation describes its controls.
+The record cannot authenticate a reply; ask the human before marking a consequential choice accepted.
 
 ## Flow
 
@@ -101,7 +107,7 @@ The state lives in the task file front-matter and nowhere else. `STATUS.md` is g
 - The requested change is complete and acceptance criteria pass.
 - Baseline checks were green before implementation, or an exception is recorded.
 - Final checks are green after the change, or an exception is recorded.
-- Validation is granted per the active profile.
+- Validation is granted per the active profile and workflow.
 - No unrelated changes were introduced.
 - New decisions exist as files in `docs/decisions/` and are listed in its index.
 - The trace exists per the active profile in `standard`.
@@ -123,7 +129,7 @@ Before new implementation, run the configured checks.
 `harness-lint` enforces the mechanical half of the Definition of Done: a `done` task must have no
 unchecked criterion and a declared `harness:` version. In `standard`, it also needs a journal line,
 and under `team`, a trace file and named validator (D-013). In `lean`, it needs passing recorded
-commands, behavior evidence, residual risk, and named human acceptance.
+commands, behavior evidence, residual risk, and the acceptance its task version requires.
 
 Two kinds of check must both be green: the ones an agent iterates against, and at least one that
 exercises the change together with what already exists. The first kind can be made to pass by
@@ -137,7 +143,10 @@ If final checks fail the task stays `doing`, `review`, or `blocked` — never `d
 ## Human Validation Gate
 
 In `standard` `solo`, accepting the change is the validation — there is no separate ceremony.
-In `lean`, the task stays in `review` until the human accepts the outcome explicitly.
+In lean 0.12, routine technical tasks close on evidence, while product and consequential tasks
+stay in `review` until the human accepts the preview or choice. Earlier lean tasks keep their gate.
+First and high-risk production releases need live approval before execution; routine releases
+follow the human-approved policy with provider-side protection, monitoring, and rollback.
 
 In `team` it is an explicit gate. Validation must be **stated**: silence, absence of objection, or
 an agent review is not approval. The validator receives, in one message:

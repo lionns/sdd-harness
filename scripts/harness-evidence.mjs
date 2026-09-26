@@ -6,9 +6,10 @@ import { join } from "node:path";
 import { ROOT, config } from "./lib/harness.mjs";
 
 const [taskId, phase, marker, command, ...args] = process.argv.slice(2);
-if (!/^[A-Z]+-\d+$/.test(taskId ?? "") || !["baseline", "task-specific", "final"].includes(phase)
+const phases = ["baseline", "task-specific", "resource-before", "resource-after", "final"];
+if (!/^[A-Z]+-\d+$/.test(taskId ?? "") || !phases.includes(phase)
     || marker !== "--" || !command) {
-  console.error("usage: harness-evidence <T-###> <baseline|task-specific|final> -- <command> [args...]");
+  console.error(`usage: harness-evidence <T-###> <${phases.join("|")}> -- <command> [args...]`);
   process.exit(2);
 }
 if (config().workflow !== "lean") {
@@ -28,7 +29,8 @@ try {
 
 const result = spawnSync(command, args, { cwd: ROOT, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 });
 const exitCode = result.status ?? 1;
-const outputTail = exitCode === 0 ? "" : `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(-1000);
+const outputTail = exitCode === 0 && !phase.startsWith("resource-")
+  ? "" : `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(-1000);
 records.push({ at: new Date().toISOString(), phase, command: [command, ...args], exitCode, outputTail });
 mkdirSync(join(ROOT, "docs/evidence"), { recursive: true });
 writeFileSync(path, `${JSON.stringify(records, null, 2)}\n`);

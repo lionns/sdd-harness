@@ -44,9 +44,13 @@ In `workflow: lean`, run configured baseline, task-specific, and final commands 
 `scripts/harness-evidence.mjs` using `T-### <phase> -- <command> [args...]`. The command records
 its real exit code in `docs/evidence/<task>.json`, including failures. A passing record is necessary
 but does not prove the claimed behavior; give the reviewer a direct observation or reproducible
-artifact and disclose what remains unverified. Keep a task in `review` until the human accepts
-the behavior and any durable decision. Successful output is omitted; failed output is bounded.
-Do not put secrets in command output.
+artifact and disclose what remains unverified. Product and consequential tasks in lean 0.12 stay
+in `review` until the human accepts; older lean tasks keep their gate. Successful check output is
+omitted; failed output is bounded.
+Do not put secrets in command output. In lean 0.12, classify resource impact before work. For
+affected runtime paths, run the same measurement command as `resource-before` and `resource-after`,
+then the final check. Compare observed latency, queries, usage, or cost against the project's budget;
+do not optimize a whole codebase from an unmeasured suggestion.
 
 Use one agent by default. Parallel implementers require separate file or interface ownership and
 isolated checkouts. Integrate in one checkout and run the common final check there. Give an

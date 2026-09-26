@@ -155,7 +155,7 @@ try {
   console.log(adopt
     ? "\nNext: work T-001. Record what this codebase already decides, one accepted decision per topic, then declare them in harness.json."
     : `\nNext: fill docs/project/brief.md, then settle the foundation — one accepted decision per topic in ${FOUNDATION_TOPICS.join(", ")}. No task leaves \`ready\` until they exist.`);
-  if (workflow === "lean") console.log("  Lean pilot: read pilot/README.md and copy pilot/contract.md for the next task.");
+  if (workflow === "lean") console.log("  Ask the human about operating constraints and consequential choices; read pilot/README.md, then copy pilot/contract.md for the next task.");
 } catch (error) {
   console.error(`harness-init: ${error.message}`);
   process.exit(1);

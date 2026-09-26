@@ -22,6 +22,7 @@
 ## Constraints
 
 - <!-- runtime, dependency, platform, compliance, or budget constraint -->
+- <!-- expected users or transactions, monthly operating budget, sensitive data, maintenance preference -->
 
 ## Success Measures
 

@@ -1,8 +1,10 @@
 # Templates
 
 For an installed `workflow: lean`, copy `pilot/contract.md` (or `contract-team.md`) instead of the standard task file
-below. Its `## Outcome` records only behavior evidence, checks, residual risk, and human decision;
-the diff and command records carry the rest. No journal or trace is needed for a lean task.
+below. Its `## Outcome` records behavior, checks, resources, review, and the needed human decision;
+the diff and command records carry the rest. Since 0.12, classify validation and resource impact
+at task start; only product and consequential closure needs human acceptance. No journal or trace
+is needed for a lean task.
 A decision file is still for a choice that constrains
 future work, not an ordinary implementation preference.
 

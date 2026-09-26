@@ -15,6 +15,8 @@
   that is genuinely wrong is changed by a decision, never by an edit made to get past it.
 - Report blockers early, with evidence.
 - Record the trace in `standard`; in `lean`, keep the outcome and executed-check evidence.
+- Agents verify technical claims and resource observations; humans test usable product previews
+  and approve consequential business tradeoffs. Sensitive work may need a qualified human reviewer.
 
 ## Roles
 

@@ -79,6 +79,10 @@ for (const [index, line] of source.split(/\r?\n/).entries()) {
     console.error(`Line ${index + 1}: accepted must be a boolean`);
     process.exit(2);
   }
+  if (run.resourceRegression7d != null && typeof run.resourceRegression7d !== "boolean") {
+    console.error(`Line ${index + 1}: resourceRegression7d must be null or boolean`);
+    process.exit(2);
+  }
   const pair = grouped.get(run.pairId) ?? {};
   if (pair[run.mode]) {
     console.error(`Line ${index + 1}: pair ${run.pairId} already has a ${run.mode} run`);
@@ -131,6 +135,7 @@ for (const [pairId, pair] of grouped) {
     behaviorObserved: { current: current.behaviorObserved, lean: lean.behaviorObserved },
     agents: { current: current.agentCount, lean: lean.agentCount },
     independentVerifier: { current: current.independentVerifier, lean: lean.independentVerifier },
+    resourceRegression7d: { current: current.resourceRegression7d ?? null, lean: lean.resourceRegression7d ?? null },
     leanMinusCurrent: difference,
   });
 }
@@ -159,6 +164,12 @@ console.log(JSON.stringify({
   observedBehavior: {
     current: pairs.filter((pair) => pair.behaviorObserved.current).length,
     lean: pairs.filter((pair) => pair.behaviorObserved.lean).length,
+  },
+  resourceRegressions7d: {
+    current: pairs.filter((pair) => pair.resourceRegression7d.current === true).length,
+    lean: pairs.filter((pair) => pair.resourceRegression7d.lean === true).length,
+    observedPairs: pairs.filter((pair) => pair.resourceRegression7d.current != null
+      && pair.resourceRegression7d.lean != null).length,
   },
   metrics,
   pairs,

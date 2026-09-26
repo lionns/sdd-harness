@@ -79,6 +79,13 @@ const changelog = changelogName();
 const traceFiles = traces();
 const TRACE_NAME = /^\d{4}-\d{2}-\d{2}_([A-Z]+-\d+)_[a-z-]+\.md$/;
 const declaredIds = specIds();
+const currentLeanRules = (version) => {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version ?? "");
+  return match && (Number(match[1]) > 0 || Number(match[2]) >= 12);
+};
+const fieldValue = (body, field) => body.match(new RegExp(`^-\\s*${field}:\\s*(.*)$`, "im"))?.[1]?.trim();
+const filled = (value) => Boolean(value && !/^(pending|\.\.\.|path\b)/i.test(value));
+const specific = (value) => filled(value) && !/^not needed\b/i.test(value);
 
 for (const task of tasks()) {
   const where = `docs/tasks/${task.name}`;
@@ -137,6 +144,18 @@ for (const task of tasks()) {
     fail(where, `harness "${task.meta.harness}" is not a version in ${changelog} (${versions.join(", ")})`);
   }
 
+  const newLean = task.meta.workflow === "lean" && currentLeanRules(task.meta.harness);
+  const scope = (section(task.text, "Scope") ?? []).join("\n");
+  const resourceImpact = fieldValue(scope, "Resource impact");
+  if (newLean && ["doing", "review", "done"].includes(task.meta.status)) {
+    if (!["routine", "product", "consequential"].includes(task.meta.validation)) {
+      fail(where, "current lean task needs validation: routine|product|consequential before work starts");
+    }
+    if (!/^(none|measured)\s+\S/i.test(resourceImpact ?? "")) {
+      fail(where, "current lean task needs - Resource impact: none|measured with a reason or affected path");
+    }
+  }
+
   // Closure integrity: `done` is a claim the Definition of Done makes checkable (D-013).
   if (task.meta.status === "done") {
     if (task.meta.workflow !== "lean" && task.meta.id && !journalIds.has(task.meta.id)) {
@@ -159,8 +178,6 @@ for (const task of tasks()) {
       const agents = (section(task.text, "Agents") ?? []).join("\n");
       const mode = agents.match(/^-\s*Mode:\s*(single|parallel)\s*$/im)?.[1];
       if (!mode) fail(where, "lean closure needs `## Agents` with `- Mode: single|parallel`");
-      const fieldValue = (body, field) => body.match(new RegExp(`^-\\s*${field}:\\s*(.*)$`, "im"))?.[1]?.trim();
-      const filled = (value) => Boolean(value && !/^(pending|\.\.\.|path\b)/i.test(value));
       if (mode === "parallel") {
         for (const field of ["Ownership", "Integration", "Verifier"]) {
           if (!filled(fieldValue(agents, field))) {
@@ -177,7 +194,27 @@ for (const task of tasks()) {
           fail(where, `lean closure needs - ${field}: in ## Outcome`);
         }
       }
-      if (!/^-\s*Human decision:\s*accepted by\s+\S/im.test(outcome)) {
+      if (newLean) {
+        const human = fieldValue(outcome, "Human decision");
+        if (["product", "consequential"].includes(task.meta.validation)
+            && !/^accepted by\s+\S/i.test(human ?? "")) {
+          fail(where, "product or consequential lean closure needs - Human decision: accepted by <person>");
+        }
+        if (task.meta.validation === "product" && !specific(fieldValue(outcome, "Preview"))) {
+          fail(where, "product lean closure needs a usable - Preview: in ## Outcome");
+        }
+        if (task.meta.validation === "consequential") {
+          if (!filled(fieldValue(agents, "Verifier")) || /^self\b/i.test(fieldValue(agents, "Verifier") ?? "")) {
+            fail(where, "consequential lean closure needs an independent - Verifier: in ## Agents");
+          }
+          if (!specific(fieldValue(outcome, "Review evidence"))) {
+            fail(where, "consequential lean closure needs - Review evidence: in ## Outcome");
+          }
+        }
+        if (/^measured\b/i.test(resourceImpact ?? "") && !specific(fieldValue(outcome, "Resource evidence"))) {
+          fail(where, "measured lean closure needs - Resource evidence: in ## Outcome");
+        }
+      } else if (!/^-\s*Human decision:\s*accepted by\s+\S/im.test(outcome)) {
         fail(where, "lean closure needs - Human decision: accepted by <person> in ## Outcome");
       }
       const evidencePath = join(ROOT, "docs/evidence", `${task.meta.id}.json`);
@@ -199,6 +236,29 @@ for (const task of tasks()) {
           }
           if (records.length && records.at(-1)?.phase !== "final") {
             fail(where, "the last recorded check must be final; rerun it after any later check");
+          }
+          if (newLean && /^measured\b/i.test(resourceImpact ?? "")) {
+            const baseline = records.findLastIndex((item) => item?.phase === "baseline");
+            const before = records.findLastIndex((item) => item?.phase === "resource-before");
+            const taskCheck = records.findLastIndex((item) => item?.phase === "task-specific");
+            const after = records.findLastIndex((item) => item?.phase === "resource-after");
+            const final = records.findLastIndex((item) => item?.phase === "final");
+            for (const [phase, index] of [["resource-before", before], ["resource-after", after]]) {
+              const record = records[index];
+              if (!record || record.exitCode !== 0 || !Array.isArray(record.command)
+                  || !record.command.length || typeof record.outputTail !== "string"
+                  || !record.outputTail.trim()) {
+                fail(where, `measured lean closure needs a passing recorded ${phase} command with output`);
+              }
+            }
+            if ([baseline, before, taskCheck, after, final].every((index) => index >= 0)
+                && !(baseline < before && before < taskCheck && taskCheck < after && after < final)) {
+              fail(where, "measured checks must run baseline, resource-before, task-specific, resource-after, final in order");
+            }
+            if (before >= 0 && after >= 0
+                && JSON.stringify(records[before]?.command) !== JSON.stringify(records[after]?.command)) {
+              fail(where, "resource-before and resource-after must use the same command");
+            }
           }
         }
       }
@@ -243,6 +303,21 @@ for (const decision of decisions()) {
   const lines = lineCount(decision.text);
   if (lines > budgets.decisionFileLines) {
     fail(where, `${lines} lines exceeds the ${budgets.decisionFileLines}-line budget`);
+  }
+  if (cfg.workflow === "lean" && currentLeanRules(cfg.harness)
+      && decision.foundation && decision.status === "accepted") {
+    if (!/^-\s*Human choice:\s*accepted by\s+[^;]+;\s*evidence:\s*\S/im.test(decision.text)) {
+      fail(where, "new lean foundation decision needs - Human choice: accepted by <person>; evidence: <reference>");
+    }
+    if (decision.foundation === "deploy") {
+      const policy = fieldValue(decision.text, "Release policy");
+      if (!/^(manual|guarded-auto)\b/i.test(policy ?? "")) {
+        fail(where, "lean deploy foundation needs - Release policy: manual|guarded-auto");
+      }
+      if (/^guarded-auto\b/i.test(policy ?? "") && !specific(fieldValue(decision.text, "Release controls"))) {
+        fail(where, "guarded-auto deploy foundation needs - Release controls: with monitoring and rollback");
+      }
+    }
   }
 }
 

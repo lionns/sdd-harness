@@ -4,6 +4,16 @@ Every released version of the SDD harness, newest first. The rules that govern a
 `MAJOR`, `MINOR` and `PATCH` mean, and what a change to the harness requires — live in
 [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
+### 0.12.0 — 2026-09-26
+
+Opt-in lean tasks now classify routine, product, and consequential validation (D-036). Routine
+technical work closes on recorded checks; product work provides a preview and human acceptance;
+consequential work also needs independent verification. Affected runtime paths record comparable
+resource commands before and after. New lean foundation choices record human acceptance and a
+deployment release policy. Existing lean task versions and standard keep their prior closure rules.
+The harness records approvals but cannot authenticate a person or block a direct deployment;
+production protection must also exist in the hosting system.
+
 ### 0.11.0 — 2026-09-26
 
 The opt-in lean workflow removes repeated records and reduces startup context. D-035.

@@ -2,7 +2,7 @@
 
 # Status — sdd-harness
 
-Harness `0.11.0` · profile `solo`
+Harness `0.12.0` · profile `solo`
 
 ## Tasks
 
@@ -33,6 +33,7 @@ Harness `0.11.0` · profile `solo`
 | [T-022](docs/tasks/T-022-lock-diagnostics-and-portability.md) | `done` | Close the six review findings the 0.9.0 pull requests drew — a garbled failure message, an |
 | [T-023](docs/tasks/T-023-lean-workflow-experiment.md) | `done` | Make the four lean-workflow changes installable and verifiable in test projects while preserving the standard workflow. |
 | [T-025](docs/tasks/T-025-trim-lean-records.md) | `done` | Make the opt-in lean workflow require fewer records and load less context without weakening observable verification or human acceptance. |
+| [T-026](docs/tasks/T-026-risk-based-lean-delivery.md) | `done` | Let agents close routine work with evidence while humans validate product behavior and approve consequential choices and releases. |
 
 ## Next
 
@@ -44,10 +45,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-09-26 | T-026 | done | lean validation follows product impact, consequential choices, and measured resource paths | 37 files | tests 127/127, lint clean | D-036
 - 2026-09-26 | T-025 | done | lean installs omit redundant records and shorten startup context | 38 files | tests 121/121, lint clean | D-035
 - 2026-09-26 | T-023 | done | opt-in lean workflow ready for fresh-project trials | 32 files | tests 118/118, lint clean | D-034
 - 2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
 - 2026-09-03 | T-021 | done | harness.lock: the linter tells a copy from a fork | 17 files | tests 107/107, lint clean, docs/sdd 528/650 | D-033
-- 2026-09-03 | T-020 | done | the release history leaves the rules budget for CHANGELOG.md | 9 files | tests 101/101, lint clean, docs/sdd 526/650 | D-032
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)

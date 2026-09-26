@@ -28,3 +28,4 @@
 2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
 2026-09-26 | T-023 | done | opt-in lean workflow ready for fresh-project trials | 32 files | tests 118/118, lint clean | D-034
 2026-09-26 | T-025 | done | lean installs omit redundant records and shorten startup context | 38 files | tests 121/121, lint clean | D-035
+2026-09-26 | T-026 | done | lean validation follows product impact, consequential choices, and measured resource paths | 37 files | tests 127/127, lint clean | D-036

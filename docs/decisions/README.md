@@ -42,3 +42,4 @@ rather than editing. Template in `../sdd/TEMPLATES.md`.
 | [D-033](D-033-installed-harness-is-a-copy.md) | 2026-09-03 | An installed harness is a copy, and the linter can say so | `accepted` | none |
 | [D-034](D-034-evidence-first-workflow-trial.md) | 2026-09-26 | Trial evidence before adding workflow ceremony | `accepted` | none |
 | [D-035](D-035-lean-record-minimization.md) | 2026-09-26 | Minimize records in the lean experiment | `accepted` | none |
+| [D-036](D-036-risk-based-product-acceptance.md) | 2026-09-26 | Put human attention on product outcomes and consequential choices | `accepted` | none |
