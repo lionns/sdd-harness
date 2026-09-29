@@ -70,6 +70,7 @@ test("rejects a pair that changes the model and a duplicate mode", () => {
 const filledTask = ({ validation = "routine", impact = "none — no runtime path" } = {}) =>
   readFileSync(new URL("../pilot/contract.md", import.meta.url), "utf8")
     .replace("T-###", "T-001")
+    .replace(/^harness: .*$/m, "harness: 0.12.0")
     .replace("status: ready", "status: done")
     .replace("validation: pending", `validation: ${validation}`)
     .replace("Resource impact: pending", `Resource impact: ${impact}`)

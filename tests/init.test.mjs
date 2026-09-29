@@ -55,6 +55,7 @@ test("lean install records real checks and lets routine technical work close wit
   assert.ok(existsSync(join(dir, "pilot/contract.md")) && existsSync(join(dir, "scripts/harness-evidence.mjs")));
   const lock = JSON.parse(readFileSync(join(dir, "harness.lock"), "utf8"));
   assert.ok(lock.files["pilot/contract.md"] && lock.files["scripts/harness-evidence.mjs"]);
+  assert.ok(existsSync(join(dir, "pilot/usage.mjs")) && lock.files["pilot/usage.mjs"]);
   const task = readFileSync(join(dir, "pilot/contract.md"), "utf8")
     .replace("T-###", "T-002").replace("status: ready", "status: review")
     .replace("validation: pending", "validation: routine")

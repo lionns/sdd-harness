@@ -2,7 +2,7 @@
 
 Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Version **0.12.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
+Version **0.13.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## The problem it solves
 
@@ -42,6 +42,8 @@ To test the four lean changes in a separate project, install with `--workflow=le
 keeps the human's review on product behavior and consequential decisions, uses parallel agents only for
 independent work, and compares full task cost with `standard`. Tokens and human review time are
 entered from actual observations; the harness does not infer them.
+The pilot also includes [local token measurement](pilot/usage.md), without model calls.
+
 In 0.12, routine lean tasks close on technical evidence. Product work needs a usable preview and
 human acceptance; consequential choices need independent verification and human acceptance.
 Resource-affecting paths record comparable before/after checks. Stack and deployment proposals

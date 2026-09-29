@@ -3,7 +3,7 @@ id: T-###
 title: Observable outcome in a few words
 status: ready
 profile: team
-harness: 0.12.0
+harness: 0.13.0
 workflow: lean
 validation: pending
 goal: What a user or another component should observe when this is complete.

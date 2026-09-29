@@ -14,6 +14,11 @@ decisions: [D-034]
 - `pilot/run.example.json` — fields collected per task
 - `docs/project/quality-gates.md` — this repository's final gate
 
+## Priority
+
+Collect local usage with T-027 before trying further token optimizations. Use the same collector
+and coverage rules for both paired runs. Complete the real-project comparison after instrumentation.
+
 ## Scope
 
 - Run matched pairs from more than one adopting project, with the same agent and model per pair.

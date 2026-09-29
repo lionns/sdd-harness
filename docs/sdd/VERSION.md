@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.12.0` · Status: `Experimental lean mode` · Date: 2026-09-26
+Version: `0.13.0` · Status: `Experimental lean mode` · Date: 2026-09-29
 
 The active version, profile, and workflow for a project live in its `harness.json`. This file holds the rules;
 the release history is `CHANGELOG.md`, at the repository root.
@@ -21,3 +21,4 @@ the release history is `CHANGELOG.md`, at the repository root.
 - `workflow: standard` preserves the journal and trace rules. `workflow: lean` is an opt-in pilot;
   its task outcome and executed-check evidence replace those duplicate records.
 - Lean tasks through 0.11 keep their per-task human acceptance; 0.12 uses risk-based validation.
+- 0.13 adds optional local usage collection to the pilot; task closure gates stay unchanged.

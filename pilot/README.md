@@ -63,7 +63,8 @@ file check cannot stop an arbitrary command from deploying.
    only after a reply and stay in `review` meanwhile. Routine tasks need none of these fields.
    Mark criteria, regenerate `STATUS.md`, and run the linter.
 6. Enter one JSON object in a private JSONL file using `pilot/run.example.json` as the shape. Record
-   actual usage supplied by the agent provider. Measure documentation time too. Include every agent
+   actual usage supplied by the agent provider. Prefer the [local collector](usage.md) and set
+   `usageFile` to its report; it makes no model calls. Measure documentation time too. Include every agent
    and coordination time; link
    the integration evidence for multi-agent runs. Leave unavailable token and cost fields null.
    Seven days later, fill rework, escaped defects, and resource regressions. Do not invent missing

@@ -100,6 +100,11 @@
       "id": "FR-17",
       "statement": "Agents present usable product previews and concise choice summaries while routine implementation records remain agent-owned.",
       "sources": ["D-036", "pilot/README.md"]
+    },
+    {
+      "id": "FR-18",
+      "statement": "The pilot collects recorded usage from explicitly selected local agent sessions without model calls, associates it with a task, deduplicates responses, and excludes incomplete coverage from task token comparisons.",
+      "sources": ["D-037", "pilot/usage.mjs", "pilot/usage.md"]
     }
   ],
   "nonFunctional": [

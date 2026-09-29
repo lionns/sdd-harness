@@ -28,6 +28,9 @@ files to six and moved budgets from prose into an executable check.
 - Risk-based product validation: agents own technical checks and resource evidence; people test
   usable previews and approve consequential architecture and production choices.
 
+- Optional local measurement of agent usage per task from existing logs, with explicit coverage
+  and no model calls, network service, or billing estimates.
+
 ### Out of Scope
 
 - Product features of any project that adopts the harness.

@@ -1,0 +1,14 @@
+{
+  "project": "example-project",
+  "taskId": "T-101",
+  "coverage": "partial",
+  "from": "2026-09-29T14:00:00Z",
+  "to": "2026-09-29T15:00:00Z",
+  "sessions": [
+    {
+      "provider": "codex",
+      "sessionId": "actual-thread-id",
+      "path": "/absolute/path/to/rollout.jsonl"
+    }
+  ]
+}

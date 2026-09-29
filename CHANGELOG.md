@@ -4,6 +4,14 @@ Every released version of the SDD harness, newest first. The rules that govern a
 `MAJOR`, `MINOR` and `PATCH` mean, and what a change to the harness requires — live in
 [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
+### 0.13.0 — 2026-09-29
+
+The pilot can collect recorded agent usage from explicitly selected local Codex and Claude logs
+without model calls or dependencies (D-037). It associates sessions and optional time intervals
+with tasks, deduplicates response records, normalizes cache accounting, and keeps incomplete
+coverage missing in paired totals. Summaries load usage reports directly. Costs remain unknown;
+this is recorded usage, not a bill. Older Codex logs and other providers require future adapters.
+
 ### 0.12.0 — 2026-09-26
 
 Opt-in lean tasks now classify routine, product, and consequential validation (D-036). Routine

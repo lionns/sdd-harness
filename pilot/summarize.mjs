@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Descriptive paired pilot summary. Missing telemetry is never inferred.
 import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 
 const [file] = process.argv.slice(2);
 if (!file) {
@@ -34,6 +35,25 @@ for (const [index, line] of source.split(/\r?\n/).entries()) {
   if (!run || typeof run !== "object" || Array.isArray(run)) {
     console.error(`Line ${index + 1}: expected a JSON object`);
     process.exit(2);
+  }
+  if (run.usageFile != null) {
+    try {
+      if (typeof run.usageFile !== "string" || !run.usageFile.trim()) throw Error("invalid path");
+      const usage = JSON.parse(readFileSync(resolve(dirname(file), run.usageFile), "utf8"));
+      if (usage.kind !== "harness-agent-usage" || usage.schemaVersion !== 1
+          || usage.project !== run.project || usage.taskId !== run.taskId
+          || !["complete", "partial"].includes(usage.coverage)) throw Error("report identity or schema mismatch");
+      for (const key of ["inputTokens", "outputTokens"]) {
+        if (usage.coverage === "complete" && (!Number.isSafeInteger(usage[key]) || usage[key] < 0)) {
+          throw Error("complete report lacks valid counters");
+        }
+        run[key] = usage.coverage === "complete" ? usage[key] : null;
+      }
+      run.usageCoverage = usage.coverage;
+    } catch {
+      console.error(`Line ${index + 1}: cannot load a matching usage report`);
+      process.exit(2);
+    }
   }
   for (const key of requiredText) {
     if (typeof run[key] !== "string" || !run[key].trim()) {
@@ -133,6 +153,7 @@ for (const [pairId, pair] of grouped) {
     currentTask: current.taskId, leanTask: lean.taskId,
     accepted: { current: current.accepted, lean: lean.accepted },
     behaviorObserved: { current: current.behaviorObserved, lean: lean.behaviorObserved },
+    usageCoverage: { current: current.usageCoverage ?? "manual", lean: lean.usageCoverage ?? "manual" },
     agents: { current: current.agentCount, lean: lean.agentCount },
     independentVerifier: { current: current.independentVerifier, lean: lean.independentVerifier },
     resourceRegression7d: { current: current.resourceRegression7d ?? null, lean: lean.resourceRegression7d ?? null },
