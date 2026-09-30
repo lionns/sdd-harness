@@ -8,7 +8,8 @@ Load only what the task needs. Do not read every harness document by default.
 2. `harness.json` (repo root) — active harness version, profile, and workflow.
 3. The assigned task file in `docs/tasks/`.
 
-If those three answer the question, stop reading.
+If those three answer the question, stop reading. `docs/` and `scripts/` are logical names: a project
+may rename them with `paths` in `harness.json`.
 
 ## Profiles
 

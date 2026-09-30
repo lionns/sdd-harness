@@ -2,7 +2,7 @@
 
 Specification-Driven Development for work done with coding agents. Zero dependencies, Node >= 24.
 
-Version **0.13.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
+Version **0.14.0** — changelog in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## The problem it solves
 
@@ -32,6 +32,8 @@ node scripts/harness-init.mjs ../my-app --project=my-app --hooks
 | `--claude` | adds a Claude Code `Stop` hook and three skills, catching a bad record a turn earlier. Optional, holds no rules |
 | `--adopt` | the repository already has code — see below |
 | `--force` | overwrite; nothing is overwritten without it |
+| `--docs-dir` | names the documentation directory, e.g. `Docs` when the repository already has one; recorded as `paths` in `harness.json` |
+| `--scripts-dir` | names the scripts directory the same way. Init refuses a name that differs from an existing directory only in letter case |
 
 You get `docs/sdd/`, blank specification templates in `docs/project/`, the two enforcement scripts,
 `harness.json`, and an `AGENTS.md` telling the agent to read `STATUS.md` first. Standard installs

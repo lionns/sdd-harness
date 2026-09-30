@@ -3,7 +3,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, config } from "./lib/harness.mjs";
+import { ROOT, config, docsPath } from "./lib/harness.mjs";
 
 const [taskId, phase, marker, command, ...args] = process.argv.slice(2);
 const phases = ["baseline", "task-specific", "resource-before", "resource-after", "final"];
@@ -17,7 +17,8 @@ if (config().workflow !== "lean") {
   process.exit(2);
 }
 
-const path = join(ROOT, "docs/evidence", `${taskId}.json`);
+const record = docsPath(`evidence/${taskId}.json`);
+const path = join(ROOT, record);
 let records = [];
 try {
   if (existsSync(path)) records = JSON.parse(readFileSync(path, "utf8"));
@@ -32,8 +33,8 @@ const exitCode = result.status ?? 1;
 const outputTail = exitCode === 0 && !phase.startsWith("resource-")
   ? "" : `${result.stdout ?? ""}${result.stderr ?? ""}`.slice(-1000);
 records.push({ at: new Date().toISOString(), phase, command: [command, ...args], exitCode, outputTail });
-mkdirSync(join(ROOT, "docs/evidence"), { recursive: true });
+mkdirSync(join(ROOT, docsPath("evidence")), { recursive: true });
 writeFileSync(path, `${JSON.stringify(records, null, 2)}\n`);
-console.log(`harness-evidence: ${taskId} ${phase} exited ${exitCode}; recorded in docs/evidence/${taskId}.json`);
+console.log(`harness-evidence: ${taskId} ${phase} exited ${exitCode}; recorded in ${record}`);
 if (result.error) console.error(`harness-evidence: ${result.error.message}`);
 process.exit(exitCode);

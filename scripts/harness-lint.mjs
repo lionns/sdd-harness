@@ -7,8 +7,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import {
   ROOT, config, tasks, decisions, journal, traces, knownVersions, changelogName, specIds, section, sddDocLines, lineCount, fileHash,
-  budgetContractProblems, taskBudgetSections,
-  TASK_STATES, DECISION_STATES,
+  budgetContractProblems, taskBudgetSections, docsPath, scriptsPath,
+  TASK_STATES, DECISION_STATES, PATH_NAME,
 } from "./lib/harness.mjs";
 import { renderStatus, renderDecisionIndex } from "./harness-status.mjs";
 
@@ -38,7 +38,7 @@ if (existsSync(lockPath)) {
   }
   const mine = lock?.source === cfg.project;
   const change = mine
-    ? "run `node scripts/harness-manifest.mjs` to record the change"
+    ? `run \`node ${scriptsPath("harness-manifest.mjs")}\` to record the change`
     : `propose the change in ${lock?.source}, then reinstall`;
   if (lock && lock.algorithm !== "sha256") {
     fail("harness.lock", `declares algorithm "${lock.algorithm}", which this harness cannot verify — upgrade it`);
@@ -71,6 +71,18 @@ if (!PROFILES.includes(cfg.profile)) {
 if (cfg.workflow && !["standard", "lean"].includes(cfg.workflow)) {
   fail("harness.json", `workflow must be standard or lean, got "${cfg.workflow}"`);
 }
+// A bad name falls back to the default when read, so the records stay findable; the mistake is
+// still a problem, reported here once instead of as every record appearing to be missing (D-038).
+if (cfg.paths !== undefined) {
+  if (!cfg.paths || typeof cfg.paths !== "object" || Array.isArray(cfg.paths)) {
+    fail("harness.json", "paths must be an object like {\"docs\": \"Docs\", \"scripts\": \"Scripts\"}");
+  } else {
+    for (const [key, value] of Object.entries(cfg.paths)) {
+      if (!["docs", "scripts"].includes(key)) fail("harness.json", `paths.${key} is not a harness directory; use docs or scripts`);
+      else if (typeof value !== "string" || !PATH_NAME.test(value)) fail("harness.json", `paths.${key} must be a single directory name, got ${JSON.stringify(value)}`);
+    }
+  }
+}
 
 const decisionIds = new Set(decisions().map((d) => d.id));
 const journalIds = new Set(journal().map((e) => e.line.split("|")[1]?.trim()));
@@ -88,7 +100,7 @@ const filled = (value) => Boolean(value && !/^(pending|\.\.\.|path\b)/i.test(val
 const specific = (value) => filled(value) && !/^not needed\b/i.test(value);
 
 for (const task of tasks()) {
-  const where = `docs/tasks/${task.name}`;
+  const where = docsPath(`tasks/${task.name}`);
   if (!task.meta) {
     fail(where, "missing YAML front-matter");
     continue;
@@ -117,7 +129,7 @@ for (const task of tasks()) {
   // Forward traceability (D-019): a link to a requirement that does not exist is worse than none.
   for (const id of task.meta.implements ?? []) {
     if (declaredIds.size && !declaredIds.has(id)) {
-      fail(where, `implements ${id}, which no file in docs/project/ declares`);
+      fail(where, `implements ${id}, which no file in ${docsPath("project")}/ declares`);
     }
   }
 
@@ -217,16 +229,16 @@ for (const task of tasks()) {
       } else if (!/^-\s*Human decision:\s*accepted by\s+\S/im.test(outcome)) {
         fail(where, "lean closure needs - Human decision: accepted by <person> in ## Outcome");
       }
-      const evidencePath = join(ROOT, "docs/evidence", `${task.meta.id}.json`);
+      const evidencePath = join(ROOT, docsPath(`evidence/${task.meta.id}.json`));
       let records;
       try {
         records = JSON.parse(readFileSync(evidencePath, "utf8"));
       } catch {
-        fail(where, `lean closure needs readable docs/evidence/${task.meta.id}.json from harness-evidence`);
+        fail(where, `lean closure needs readable ${docsPath(`evidence/${task.meta.id}.json`)} from harness-evidence`);
       }
       if (records !== undefined) {
         if (!Array.isArray(records)) {
-          fail(where, `docs/evidence/${task.meta.id}.json must be an array`);
+          fail(where, `${docsPath(`evidence/${task.meta.id}.json`)} must be an array`);
         } else {
           for (const phase of ["baseline", "task-specific", "final"]) {
             const record = records.filter((item) => item?.phase === phase).at(-1);
@@ -268,7 +280,7 @@ for (const task of tasks()) {
   if (cfg.profile === "team") {
     const own = traceFiles.filter((t) => TRACE_NAME.exec(t.name)?.[1] === task.meta.id);
     if (task.meta.workflow !== "lean" && task.meta.status !== "ready" && own.length === 0) {
-      fail(where, `team profile requires a trace file at docs/traces/<YYYY-MM-DD>_${task.meta.id}_<role>.md`);
+      fail(where, `team profile requires a trace file at ${docsPath("traces")}/<YYYY-MM-DD>_${task.meta.id}_<role>.md`);
     }
     const validation = section(task.text, "Validation") ?? [];
     if (task.meta.workflow !== "lean" && task.meta.status === "done"
@@ -279,7 +291,7 @@ for (const task of tasks()) {
 }
 
 for (const t of traceFiles) {
-  const where = `docs/traces/${t.name}`;
+  const where = docsPath(`traces/${t.name}`);
   if (!TRACE_NAME.test(t.name)) {
     fail(where, "filename must match <YYYY-MM-DD>_<T-###>_<role>.md");
   }
@@ -290,7 +302,7 @@ for (const t of traceFiles) {
 }
 
 for (const decision of decisions()) {
-  const where = `docs/decisions/${decision.name}`;
+  const where = docsPath(`decisions/${decision.name}`);
   if (!/^D-\d{3}-[a-z0-9-]+\.md$/.test(decision.name)) {
     fail(where, "filename must match D-###-kebab-slug.md");
   }
@@ -328,7 +340,7 @@ const foundation = Array.isArray(cfg.foundation) ? cfg.foundation : [];
 const settled = new Map();
 for (const decision of decisions()) {
   if (!decision.foundation) continue;
-  const where = `docs/decisions/${decision.name}`;
+  const where = docsPath(`decisions/${decision.name}`);
   if (foundation.length && !foundation.includes(decision.foundation)) {
     fail(where, `foundation topic "${decision.foundation}" is not one of ${foundation.join(" | ")} in harness.json`);
     continue;
@@ -338,7 +350,7 @@ for (const decision of decisions()) {
 }
 for (const [topic, files] of settled) {
   if (files.length > 1) {
-    fail("docs/decisions/", `foundation topic "${topic}" is settled by ${files.length} accepted decisions (${files.join(", ")}) — supersede one`);
+    fail(`${docsPath("decisions")}/`, `foundation topic "${topic}" is settled by ${files.length} accepted decisions (${files.join(", ")}) — supersede one`);
   }
 }
 const started = tasks().filter((t) => t.meta?.status && t.meta.status !== "ready");
@@ -362,13 +374,13 @@ for (const entry of journal()) {
 
 const sdd = sddDocLines();
 if (sdd > budgets.sddDocsTotalLines) {
-  fail("docs/sdd/", `${sdd} lines exceeds the ${budgets.sddDocsTotalLines}-line budget for harness docs`);
+  fail(`${docsPath("sdd")}/`, `${sdd} lines exceeds the ${budgets.sddDocsTotalLines}-line budget for harness docs`);
 }
 
-for (const [path, render] of [["STATUS.md", renderStatus], ["docs/decisions/README.md", renderDecisionIndex]]) {
+for (const [path, render] of [["STATUS.md", renderStatus], [docsPath("decisions/README.md"), renderDecisionIndex]]) {
   const full = join(ROOT, path);
   const current = existsSync(full) ? readFileSync(full, "utf8") : null;
-  if (current !== render()) fail(path, "stale — run `node scripts/harness-status.mjs`");
+  if (current !== render()) fail(path, `stale — run \`node ${scriptsPath("harness-status.mjs")}\``);
 }
 
 // A backlog is not a defect, so this never changes the exit code — it only makes the gap between
@@ -377,7 +389,7 @@ const implemented = new Set(tasks().flatMap((t) => t.meta?.implements ?? []));
 const unimplemented = [...declaredIds].filter((id) => !implemented.has(id));
 
 if (problems.length === 0) {
-  console.log(`harness-lint: clean (${tasks().length} tasks, ${decisionIds.size} decisions, docs/sdd ${sdd}/${budgets.sddDocsTotalLines} lines)`);
+  console.log(`harness-lint: clean (${tasks().length} tasks, ${decisionIds.size} decisions, ${docsPath("sdd")} ${sdd}/${budgets.sddDocsTotalLines} lines)`);
   if (unimplemented.length) {
     const shown = unimplemented.slice(0, 5).join(", ");
     const rest = unimplemented.length > 5 ? `, +${unimplemented.length - 5} more` : "";

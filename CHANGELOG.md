@@ -4,6 +4,16 @@ Every released version of the SDD harness, newest first. The rules that govern a
 `MAJOR`, `MINOR` and `PATCH` mean, and what a change to the harness requires — live in
 [`docs/sdd/VERSION.md`](docs/sdd/VERSION.md).
 
+### 0.14.0 — 2026-09-30
+
+A project may name its documentation and scripts directories with `paths` in `harness.json`, for
+example `{"docs": "Docs", "scripts": "Scripts"}` when the repository already versions those (D-038).
+Every script, both hooks, and the lock resolve them at run time, so vendored files stay identical.
+`harness-init` accepts `--docs-dir` and `--scripts-dir` and refuses a name that differs from an
+existing directory only in letter case — the silent collision a case-insensitive disk used to allow.
+Without `paths` nothing changes. Moving an existing install means copying the vendored files into
+the named directories, adding `paths`, and regenerating the lock keyed by the installed paths.
+
 ### 0.13.0 — 2026-09-29
 
 The pilot can collect recorded agent usage from explicitly selected local Codex and Claude logs

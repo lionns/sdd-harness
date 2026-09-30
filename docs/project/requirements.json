@@ -105,6 +105,11 @@
       "id": "FR-18",
       "statement": "The pilot collects recorded usage from explicitly selected local agent sessions without model calls, associates it with a task, deduplicates responses, and excludes incomplete coverage from task token comparisons.",
       "sources": ["D-037", "pilot/usage.mjs", "pilot/usage.md"]
+    },
+    {
+      "id": "FR-19",
+      "statement": "An adopting project may name its documentation and scripts directories in harness.json; every script, hook, and lock resolves them there, and installation refuses a directory that differs only in letter case.",
+      "sources": ["D-038"]
     }
   ],
   "nonFunctional": [

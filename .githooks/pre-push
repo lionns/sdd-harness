@@ -4,7 +4,10 @@
 # Vendor-neutral by construction: git runs this for every agent, and for a human using none. Enable
 # it once per clone with `git config core.hooksPath .githooks`. Bypass with `git push --no-verify`,
 # which is a decision to record, not a habit.
-lint="$(git rev-parse --show-toplevel)/scripts/harness-lint.mjs"
+root="$(git rev-parse --show-toplevel)"
+# The scripts directory is whatever harness.json names, `scripts` by default (D-038).
+scripts="$(node -e 'let d="scripts";try{const p=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).paths;if(p&&typeof p.scripts==="string"&&/^(?!\.{1,2}$)[A-Za-z0-9._-]+$/.test(p.scripts))d=p.scripts}catch{}process.stdout.write(d)' "$root/harness.json" 2>/dev/null)"
+lint="$root/${scripts:-scripts}/harness-lint.mjs"
 [ -f "$lint" ] || exit 0
 node "$lint" || {
   echo "" >&2

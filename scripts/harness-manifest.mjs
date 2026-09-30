@@ -8,7 +8,7 @@
  */
 import { readdirSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
-import { ROOT, config, fileHash, isEntrypoint } from "./lib/harness.mjs";
+import { ROOT, config, fileHash, isEntrypoint, DEFAULT_PATHS } from "./lib/harness.mjs";
 
 /**
  * The governance surface an install vendors into a target, as `[source, installed]`. It mirrors the
@@ -29,15 +29,24 @@ export const VENDORED = [
 const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
   entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)]);
 
+/** Where one vendored path lands in a target that names its docs and scripts directories (D-038). */
+export function installedPath(to, target = DEFAULT_PATHS) {
+  const [head, ...rest] = to.split("/");
+  const renamed = head === "docs" ? target.docs : head === "scripts" ? target.scripts : head;
+  return [renamed, ...rest].join("/");
+}
+
 /**
  * Every installed path, keyed as the target sees it rather than as this repository stores it.
  *
  * Keys are `/`-separated on every platform: the lock is committed and read wherever it lands, and
- * a manifest generated on Windows must verify on macOS (T-022).
+ * a manifest generated on Windows must verify on macOS (T-022). `target` names the target's docs
+ * and scripts directories; the hashes do not change, because the files are copied verbatim.
  */
-export function manifest(root = ROOT) {
+export function manifest(root = ROOT, target = DEFAULT_PATHS) {
   const files = {};
-  for (const [from, to] of VENDORED) {
+  for (const [from, vendored] of VENDORED) {
+    const to = installedPath(vendored, target);
     const source = join(root, from);
     const paths = from.endsWith(".mjs") ? [source] : walk(source);
     for (const path of paths) {

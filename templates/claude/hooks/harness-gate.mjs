@@ -8,7 +8,7 @@
  *
  * Zero dependencies, Node built-ins only (D-021).
  */
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -28,7 +28,14 @@ try { input = JSON.parse(stdin || "{}"); } catch { input = {}; }
 if (input.stop_hook_active) process.exit(0);
 
 const root = process.env.CLAUDE_PROJECT_DIR ?? input.cwd ?? process.cwd();
-const lint = join(root, "scripts", "harness-lint.mjs");
+// The scripts directory is whatever harness.json names, `scripts` by default (D-038). Read inline:
+// this hook is standalone and cannot import a library whose location is the question.
+let scripts = "scripts";
+try {
+  const named = JSON.parse(readFileSync(join(root, "harness.json"), "utf8")).paths?.scripts;
+  if (typeof named === "string" && /^(?!\.{1,2}$)[A-Za-z0-9._-]+$/.test(named)) scripts = named;
+} catch { /* no harness.json: the existsSync below keeps the gate out of the way */ }
+const lint = join(root, scripts, "harness-lint.mjs");
 if (!existsSync(lint)) process.exit(0);
 
 const result = spawnSync(process.execPath, [lint], { cwd: root, encoding: "utf8" });

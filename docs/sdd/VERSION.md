@@ -1,6 +1,6 @@
 # Harness Version
 
-Version: `0.13.0` · Status: `Experimental lean mode` · Date: 2026-09-29
+Version: `0.14.0` · Status: `Experimental lean mode` · Date: 2026-09-30
 
 The active version, profile, and workflow for a project live in its `harness.json`. This file holds the rules;
 the release history is `CHANGELOG.md`, at the repository root.

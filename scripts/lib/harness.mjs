@@ -68,10 +68,10 @@ export function taskBudgetSections(text) {
 const SCRIPT_EXTENSIONS = new Set([".cjs", ".js", ".mjs", ".ts", ".tsx"]);
 
 /**
- * Finds every configured budget property read by source under scripts/, including nested readers.
+ * Finds every configured budget property read by source under the scripts directory, nested too.
  *
  * The match is textual, not parsed: writing `budgets.<name>` in a comment or string under
- * `scripts/` makes that key required in `harness.json`. Deliberate — it errs toward more
+ * the scripts directory makes that key required in `harness.json`. Deliberate — it errs toward more
  * enforcement, never less — but it means prose here must not spell the pattern out (D-031).
  */
 export function enforcedBudgetKeys(root = ROOT) {
@@ -88,7 +88,7 @@ export function enforcedBudgetKeys(root = ROOT) {
       }
     }
   };
-  scan(join(root, "scripts"));
+  scan(join(root, scriptsPath("", root)));
   return [...keys].sort();
 }
 
@@ -113,6 +113,40 @@ export function fileHash(path) {
 
 export function config(root = ROOT) {
   return JSON.parse(readFileSync(join(root, "harness.json"), "utf8"));
+}
+
+/** Where a project keeps its records and scripts when `harness.json` does not say (D-038). */
+export const DEFAULT_PATHS = { docs: "docs", scripts: "scripts" };
+
+/** A single directory name: no separator, no traversal, nothing a join could escape through. */
+export const PATH_NAME = /^(?!\.{1,2}$)[A-Za-z0-9._-]+$/;
+
+/**
+ * The directory names this project uses for `docs` and `scripts`.
+ *
+ * Read at run time rather than baked in at install, so every vendored file stays byte-identical to
+ * the source and the lock still verifies (D-038). A missing or unreadable `harness.json` yields the
+ * defaults: the linter reports that problem itself, and a reader here must not crash first.
+ */
+export function paths(root = ROOT) {
+  let declared = {};
+  try {
+    declared = config(root).paths ?? {};
+  } catch {
+    declared = {};
+  }
+  const pick = (key) => (typeof declared[key] === "string" && PATH_NAME.test(declared[key]) ? declared[key] : DEFAULT_PATHS[key]);
+  return { docs: pick("docs"), scripts: pick("scripts") };
+}
+
+/** A `/`-separated path under the docs directory, for messages, links, and joins alike. */
+export function docsPath(sub = "", root = ROOT) {
+  return sub ? `${paths(root).docs}/${sub}` : paths(root).docs;
+}
+
+/** A `/`-separated path under the scripts directory. */
+export function scriptsPath(sub = "", root = ROOT) {
+  return sub ? `${paths(root).scripts}/${sub}` : paths(root).scripts;
 }
 
 function listMarkdown(dir, filter = () => true) {
@@ -151,12 +185,12 @@ export function section(text, name) {
 }
 
 export function tasks(root = ROOT) {
-  return listMarkdown(join(root, "docs/tasks")).map((f) => ({ ...f, meta: frontMatter(f.text) }));
+  return listMarkdown(join(root, docsPath("tasks", root))).map((f) => ({ ...f, meta: frontMatter(f.text) }));
 }
 
 export function decisions(root = ROOT) {
   // Collect every non-index file so a malformed name is reported, not silently skipped.
-  return listMarkdown(join(root, "docs/decisions"), (f) => f !== "README.md").map((f) => {
+  return listMarkdown(join(root, docsPath("decisions", root)), (f) => f !== "README.md").map((f) => {
     const title = f.text.match(/^#\s*(.+)$/m)?.[1]?.trim() ?? f.name;
     const status = f.text.match(/^-\s*Status:\s*(\S+)/m)?.[1]?.trim().toLowerCase() ?? "";
     const date = f.text.match(/^-\s*Date:\s*(\S+)/m)?.[1]?.trim() ?? "-";
@@ -176,18 +210,18 @@ export function journal(root = ROOT) {
 }
 
 export function traces(root = ROOT) {
-  return listMarkdown(join(root, "docs/traces"));
+  return listMarkdown(join(root, docsPath("traces", root)));
 }
 
 /** Where the release history lives: the root changelog, or `VERSION.md` before 0.9.0 moved it. */
 export function changelogPath(root = ROOT) {
   const moved = join(root, "CHANGELOG.md");
-  return existsSync(moved) ? moved : join(root, "docs/sdd/VERSION.md");
+  return existsSync(moved) ? moved : join(root, docsPath("sdd/VERSION.md", root));
 }
 
 /** That file's path relative to the repository, so a failure can name the file it actually read. */
 export function changelogName(root = ROOT) {
-  return changelogPath(root) === join(root, "CHANGELOG.md") ? "CHANGELOG.md" : "docs/sdd/VERSION.md";
+  return changelogPath(root) === join(root, "CHANGELOG.md") ? "CHANGELOG.md" : docsPath("sdd/VERSION.md", root);
 }
 
 /**
@@ -208,7 +242,7 @@ export function knownVersions(root = ROOT) {
  */
 export function specIds(root = ROOT) {
   const ids = new Set();
-  const dir = join(root, "docs/project");
+  const dir = join(root, docsPath("project", root));
   if (!existsSync(dir)) return ids;
   for (const name of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     let parsed;
@@ -230,5 +264,5 @@ export function specIds(root = ROOT) {
 }
 
 export function sddDocLines(root = ROOT) {
-  return listMarkdown(join(root, "docs/sdd")).reduce((total, f) => total + lineCount(f.text), 0);
+  return listMarkdown(join(root, docsPath("sdd", root))).reduce((total, f) => total + lineCount(f.text), 0);
 }

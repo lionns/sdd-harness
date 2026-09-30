@@ -2,7 +2,7 @@
 
 # Status — sdd-harness
 
-Harness `0.13.0` · profile `solo`
+Harness `0.14.0` · profile `solo`
 
 ## Tasks
 
@@ -35,6 +35,7 @@ Harness `0.13.0` · profile `solo`
 | [T-025](docs/tasks/T-025-trim-lean-records.md) | `done` | Make the opt-in lean workflow require fewer records and load less context without weakening observable verification or human acceptance. |
 | [T-026](docs/tasks/T-026-risk-based-lean-delivery.md) | `done` | Let agents close routine work with evidence while humans validate product behavior and approve consequential choices and releases. |
 | [T-027](docs/tasks/T-027-passive-task-usage.md) | `done` | Make task token measurement reproducible from existing logs without asking an agent to estimate usage. |
+| [T-028](docs/tasks/T-028-configurable-harness-paths.md) | `done` | A project whose documentation and scripts live in differently named directories, such as Docs/ and Scripts/, runs every harness script, hook and lock check on a case-sensitive filesystem. |
 
 ## Next
 
@@ -46,10 +47,10 @@ None. All decisions are accepted or superseded.
 
 ## Journal — last 5
 
+- 2026-09-30 | T-028 | done | adopters name docs and scripts directories; init refuses case-only collisions | 26 files | tests 144/144, case-sensitive 144/144, lint clean | D-038
 - 2026-09-29 | T-027 | done | passive session-to-task usage collection prioritized for the lean pilot | 26 files | tests 138/138, lint clean | D-037
 - 2026-09-26 | T-026 | done | lean validation follows product impact, consequential choices, and measured resource paths | 37 files | tests 127/127, lint clean | D-036
 - 2026-09-26 | T-025 | done | lean installs omit redundant records and shorten startup context | 38 files | tests 121/121, lint clean | D-035
 - 2026-09-26 | T-023 | done | opt-in lean workflow ready for fresh-project trials | 32 files | tests 118/118, lint clean | D-034
-- 2026-09-03 | T-022 | done | the lock fails in sentences, and keys the same on every platform | 6 files | tests 111/111, lint clean | -
 
 Full history: [`JOURNAL.md`](JOURNAL.md) · decisions: [`docs/decisions/`](docs/decisions/README.md)
